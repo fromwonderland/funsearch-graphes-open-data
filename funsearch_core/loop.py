@@ -14,9 +14,20 @@ import pathlib
 import time
 from typing import List, Tuple
 
-from .evaluator import Evaluator
-from .generator import FunSearchGenerator
-from .selector import Selector
+try:
+    # When executed as a module: python -m funsearch_core.loop
+    from .evaluator import Evaluator
+    from .generator import FunSearchGenerator
+    from .selector import Selector
+except ImportError:  # pragma: no cover
+    # When executed as a script: python funsearch_core/loop.py
+    import sys
+    _repo_root = pathlib.Path(__file__).resolve().parents[1]
+    if str(_repo_root) not in sys.path:
+        sys.path.insert(0, str(_repo_root))
+    from funsearch_core.evaluator import Evaluator
+    from funsearch_core.generator import FunSearchGenerator
+    from funsearch_core.selector import Selector
 
 
 def run_loop(

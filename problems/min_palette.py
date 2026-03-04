@@ -45,7 +45,21 @@ def load_solution_function(candidate_code: str) -> Callable[[Graph], Coloring]:
         return {node: color_id, ...}
     """
     local_vars: Dict[str, object] = {}
-    safe_globals = {"__builtins__": {"range": range, "len": len}}
+    # Minimal "safe" builtins for typical algorithmic code (no file/network access).
+    safe_globals = {
+        "__builtins__": {
+            "range": range,
+            "len": len,
+            "sorted": sorted,
+            "set": set,
+            "list": list,
+            "dict": dict,
+            "enumerate": enumerate,
+            "min": min,
+            "max": max,
+            "abs": abs,
+        }
+    }
     exec(candidate_code, safe_globals, local_vars)  # nosec: controlled demo code
     if "color_graph" not in local_vars:
         raise ValueError("Candidate code must define color_graph(graph).")
