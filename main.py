@@ -180,7 +180,11 @@ def get_heuristic_description() -> str:
         prompt = prompt_template.format(best_heuristics="\n\n".join(heuristic_codes))
         
         # Generate new heuristics
-        generator = FunSearchGenerator(None)  # We'll implement this properly
+        generator = FunSearchGenerator(
+            prompt_path=os.path.join(self.prompts_dir, "llm_prompt.txt"),
+            use_llm=True,
+            model_name="Salesforce/codet5-small"
+        )
         new_heuristics = generator.generate_candidates(
             previous_solutions=heuristic_codes, 
             n=self.candidates_per_cycle

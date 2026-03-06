@@ -1,8 +1,5 @@
 """
-Candidate generator stub.
-
-In production you would call an LLM with the prompt and prior solutions.
-Here we ship a deterministic fallback so the pipeline can run offline.
+FunSearch Generator - LLM-based heuristic generation for Sudoku
 """
 
 from __future__ import annotations
@@ -14,230 +11,344 @@ import random
 import textwrap
 import urllib.error
 import urllib.request
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
+
+try:
+    from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+    import torch
+    TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    TRANSFORMERS_AVAILABLE = False
 
 
 class FunSearchGenerator:
+    """
+    Generates new Sudoku heuristics using LLM (CodeT5) or templates
+    """
+    
     def __init__(
         self,
-        prompt_path: pathlib.Path,
+        prompt_path: Optional[pathlib.Path] = None,
         *,
-        use_ollama: bool | None = None,
-        ollama_base_url: str | None = None,
-        ollama_model: str | None = None,
-        ollama_timeout_s: float = 90.0,
+        use_llm: bool = True,
+        model_name: str = "Salesforce/codet5-small"
     ):
+        """
+        Initialize LLM generator.
+        
+        Args:
+            prompt_path: Path to prompt file (optional)
+            use_llm: Whether to use LLM or template-based generation
+            model_name: HuggingFace model name for LLM
+        """
         self.prompt_path = prompt_path
-        self.prompt = prompt_path.read_text(encoding="utf-8")
-        self.use_ollama = use_ollama if use_ollama is not None else (os.getenv("FUNSEARCH_USE_OLLAMA", "1") == "1")
-        self.ollama_base_url = ollama_base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-        self.ollama_model = ollama_model or os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
-        self.ollama_timeout_s = float(os.getenv("OLLAMA_TIMEOUT_S", str(ollama_timeout_s)))
-
+        self.use_llm = use_llm and TRANSFORMERS_AVAILABLE
+        self.model_name = model_name
+        
+        if self.use_llm:
+            print(f"Loading LLM: {self.model_name}")
+            try:
+                self.device = "cuda" if torch.cuda.is_available() else "cpu"
+                self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
+                self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
+                self.model.to(self.device)
+                
+                # Add padding token if needed
+                if self.tokenizer.pad_token is None:
+                    self.tokenizer.pad_token = self.tokenizer.eos_token
+                    
+                print(f"LLM loaded successfully on {self.device}")
+            except Exception as e:
+                print(f"Error loading model {self.model_name}: {e}")
+                print("Falling back to template-based generation")
+                self.use_llm = False
+                self.model = None
+                self.tokenizer = None
+        else:
+            print("Using template-based generation (no LLM)")
+            self.model = None
+            self.tokenizer = None
+    
     def generate_candidates(
-        self, previous_solutions: Optional[List[str]] = None, n: int = 3
-    ) -> List[str]:
-        """Return Python code strings. Uses Ollama if available; falls back to offline stubs."""
-        if self.use_ollama:
-            try:
-                return self._generate_with_ollama(previous_solutions=previous_solutions, n=n)
-            except Exception:
-                # Keep demo resilient: if Ollama is down/unreachable, still run.
-                pass
-        return self._generate_offline(previous_solutions=previous_solutions, n=n)
-
-    def _generate_with_ollama(
-        self, previous_solutions: Optional[List[str]] = None, n: int = 3
+        self,
+        previous_solutions: List[str],
+        n: int = 3,
+        temperature: float = 0.7,
+        stop: str | None = None,
     ) -> List[str]:
         """
-        Call Ollama local API to generate code.
-
-        Requires an Ollama service running at OLLAMA_BASE_URL (default localhost:11434).
+        Generate new heuristic candidates based on previous best solutions.
+        
+        Args:
+            previous_solutions: List of best heuristic codes
+            n: Number of new candidates to generate
+            temperature: Sampling temperature for LLM
+            stop: Stop sequence for generation
+            
+        Returns:
+            List of new heuristic code strings
         """
-        system = (
-            "You are an expert Python developer. "
-            "You generate ONLY valid Python code (no markdown fences). "
-            "Return exactly one function definition color_graph(graph) using graph['edges'] (list of (u,v))."
-        )
-        reinject = ""
-        if previous_solutions:
-            reinject = "\n\nPrevious best solution(s) (for improvement, do NOT copy blindly):\n" + "\n\n".join(
-                previous_solutions[:2]
-            )
-
-        user_prompt = (
-            self.prompt
-            + "\n\nGraph format example: graph = {'edges': [(0,1), (1,2), (2,0)]}"
-            + "\nReturn a dict node->color, using as few colors as possible."
-            + reinject
-            + "\n\nNow output Python code only, defining color_graph(graph) and nothing else."
-        )
-
-        outputs: List[str] = []
+        if self.model is None or self.tokenizer is None:
+            return self._generate_template_candidates(previous_solutions, n)
+        
+        new_candidates = []
+        
         for i in range(n):
-            payload = {
-                "model": self.ollama_model,
-                "prompt": user_prompt,
-                "system": system,
-                "stream": False,
-                "options": {
-                    "temperature": 0.2 if i == 0 else 0.6,
-                    "top_p": 0.9,
-                },
-            }
-            url = self.ollama_base_url.rstrip("/") + "/api/generate"
-            req = urllib.request.Request(
-                url,
-                data=json.dumps(payload).encode("utf-8"),
-                headers={"Content-Type": "application/json"},
-                method="POST",
-            )
             try:
-                with urllib.request.urlopen(req, timeout=self.ollama_timeout_s) as resp:
-                    raw = resp.read().decode("utf-8")
-            except urllib.error.URLError as exc:
-                raise RuntimeError(f"Ollama request failed: {exc}") from exc
+                candidate = self._generate_single_candidate(previous_solutions, i)
+                if candidate and self._validate_candidate(candidate):
+                    new_candidates.append(candidate)
+                else:
+                    # Fallback to template if LLM fails
+                    fallback = self._generate_template_candidates(previous_solutions, 1)
+                    if fallback:
+                        new_candidates.extend(fallback)
+                        
+            except Exception as e:
+                print(f"Error generating candidate {i}: {e}")
+                # Use template fallback
+                fallback = self._generate_template_candidates(previous_solutions, 1)
+                if fallback:
+                    new_candidates.extend(fallback)
+        
+        return new_candidates[:n]
+    
+    def _generate_single_candidate(self, previous_solutions: List[str], candidate_id: int) -> str:
+        """Generate a single candidate using LLM."""
+        
+        # Create prompt from best solutions
+        best_solution = previous_solutions[0] if previous_solutions else ""
+        
+        prompt = f"""You are an expert Sudoku solver. Create a new heuristic function for solving Sudoku puzzles.
 
-            data = json.loads(raw)
-            text = (data.get("response") or "").strip()
-            outputs.append(self._sanitize_candidate_code(text))
+The current best heuristic is:
+```python
+{best_solution}
+```
 
-        # Basic contract check: ensure we have a def color_graph and references to graph["edges"].
-        validated = [code for code in outputs if self._looks_valid(code)]
-        if len(validated) < n:
-            # Fill the rest with offline fallbacks for robustness.
-            validated.extend(
-                self._generate_offline(previous_solutions=previous_solutions, n=n - len(validated))
-            )
-        return validated[:n]
+Create a NEW, IMPROVED heuristic that:
+1. Uses a different strategy (e.g., degree heuristic, constraint propagation, pattern recognition)
+2. Is efficient and well-commented
+3. Maintains the same function signature
+4. Includes get_heuristic_name() and get_heuristic_description() functions
 
-    @staticmethod
-    def _sanitize_candidate_code(text: str) -> str:
-        """
-        Normalize common LLM responses into pure Python code.
+Return only the complete Python code:
 
-        Handles:
-        - ```python ... ``` fences
-        - a leading 'python' line (seen in some UIs)
-        """
-        cleaned = text.strip()
-        if cleaned.startswith("```"):
-            # ```python\n...\n```
-            parts = cleaned.split("```")
-            if len(parts) >= 3:
-                cleaned = parts[1]
-                # drop optional language tag on first line
-                cleaned_lines = cleaned.splitlines()
-                if cleaned_lines and cleaned_lines[0].strip().lower() in {"python", "py"}:
-                    cleaned = "\n".join(cleaned_lines[1:])
-            else:
-                cleaned = cleaned.replace("```", "")
+```python
+import numpy as np
+from typing import Tuple, Optional
+from solver.utils import get_candidates
 
-        # Some models respond with a first line "python"
-        lines = cleaned.splitlines()
-        if lines and lines[0].strip().lower() in {"python", "py"}:
-            cleaned = "\n".join(lines[1:])
+def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
+    # Your new heuristic implementation here
+    pass
 
-        return cleaned.strip() + "\n"
+def get_heuristic_name() -> str:
+    return "your_heuristic_name"
 
-    @staticmethod
-    def _looks_valid(code: str) -> bool:
-        """Heuristic: must define color_graph and access graph['edges']."""
-        lowered = code.lower()
-        return "def color_graph" in lowered and "graph[" in lowered and "edges" in lowered
+def get_heuristic_description() -> str:
+    return "Description of your heuristic strategy"
+```"""
 
-    def _generate_offline(
-        self, previous_solutions: Optional[List[str]] = None, n: int = 3
-    ) -> List[str]:
-        """Offline deterministic candidates so the pipeline works without any LLM."""
-        seeds = [
-            """
-def color_graph(graph):
-    # Simple greedy coloring.
-    edges = graph["edges"]
-    adj = {}
-    for u, v in edges:
-        adj.setdefault(u, []).append(v)
-        adj.setdefault(v, []).append(u)
-    colors = {}
-    for node in sorted(adj):
-        used = {colors[n] for n in adj[node] if n in colors}
-        color = 0
-        while color in used:
-            color += 1
-        colors[node] = color
-    return colors
-""",
-            """
-def color_graph(graph):
-    # Degree-sorted greedy (tends to reduce palette).
-    edges = graph["edges"]
-    adj = {}
-    for u, v in edges:
-        adj.setdefault(u, []).append(v)
-        adj.setdefault(v, []).append(u)
-    order = sorted(adj.keys(), key=lambda n: -len(adj[n]))
-    colors = {}
-    for node in order:
-        used = {colors[n] for n in adj[node] if n in colors}
-        color = 0
-        while color in used:
-            color += 1
-        colors[node] = color
-    return colors
-""",
-            """
-def color_graph(graph):
-    # Try to reuse colors aggressively by scanning neighbors first.
-    edges = graph["edges"]
-    adj = {}
-    for u, v in edges:
-        adj.setdefault(u, []).append(v)
-        adj.setdefault(v, []).append(u)
-    colors = {}
-    for node in sorted(adj):
-        neighbor_colors = [colors[n] for n in adj[node] if n in colors]
-        palette = sorted(set(neighbor_colors))
-        chosen = 0
-        while chosen in palette:
-            chosen += 1
-        colors[node] = chosen
-    return colors
-""",
+        # Tokenize input
+        inputs = self.tokenizer(
+            prompt, 
+            return_tensors="pt", 
+            truncation=True, 
+            max_length=1024,
+            padding=True
+        ).to(self.device)
+        
+        # Generate with appropriate parameters for code
+        outputs = self.model.generate(
+            **inputs,
+            max_length=512,
+            temperature=0.7,
+            do_sample=True,
+            top_p=0.95,
+            num_return_sequences=1,
+            pad_token_id=self.tokenizer.eos_token_id
+        )
+        
+        # Decode and clean output
+        generated_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+        
+        # Extract Python code from response
+        candidate_code = self._extract_python_code(generated_text)
+        
+        return candidate_code
+    
+    def _extract_python_code(self, text: str) -> str:
+        """Extract Python code from generated text."""
+        # Look for code blocks
+        if "```python" in text:
+            start = text.find("```python") + 9
+            end = text.find("```", start)
+            if end != -1:
+                return text[start:end].strip()
+        
+        # Look for any code block
+        if "```" in text:
+            start = text.find("```") + 3
+            end = text.find("```", start)
+            if end != -1:
+                code = text[start:end].strip()
+                if not code.startswith("python"):
+                    return code
+        
+        # Return the whole text if no code blocks found
+        return text.strip()
+    
+    def _validate_candidate(self, candidate_code: str) -> bool:
+        """Validate that the candidate code is syntactically correct and has required functions."""
+        try:
+            # Check syntax
+            compile(candidate_code, '<string>', 'exec')
+            
+            # Check for required functions
+            required_functions = ['get_next_cell', 'get_heuristic_name', 'get_heuristic_description']
+            for func_name in required_functions:
+                if f'def {func_name}(' not in candidate_code:
+                    return False
+            
+            return True
+            
+        except SyntaxError:
+            return False
+        except Exception:
+            return False
+    
+    def _generate_template_candidates(self, previous_solutions: List[str], n: int) -> List[str]:
+        """Generate candidates using predefined templates when LLM is not available."""
+        
+        templates = [
+            # Degree heuristic
+            '''import numpy as np
+from typing import Tuple, Optional
+from solver.utils import get_candidates
+
+def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
+    """
+    Degree heuristic: choose cell that affects most constrained cells.
+    """
+    max_degree = -1
+    best_cell = None
+    
+    for row in range(9):
+        for col in range(9):
+            if board[row, col] == 0:
+                # Count empty cells in same row, column, and box
+                degree = 0
+                
+                # Count empty in row
+                degree += sum(1 for c in range(9) if board[row, c] == 0 and c != col)
+                
+                # Count empty in column  
+                degree += sum(1 for r in range(9) if board[r, col] == 0 and r != row)
+                
+                # Count empty in box
+                box_row, box_col = 3 * (row // 3), 3 * (col // 3)
+                for br in range(box_row, box_row + 3):
+                    for bc in range(box_col, box_col + 3):
+                        if board[br, bc] == 0 and (br != row or bc != col):
+                            degree += 1
+                
+                if degree > max_degree:
+                    max_degree = degree
+                    best_cell = (row, col)
+    
+    return best_cell
+
+def get_heuristic_name() -> str:
+    return "degree_heuristic"
+
+def get_heuristic_description() -> str:
+    return "Degree heuristic - chooses cell affecting most constrained cells"
+''',
+            
+            # Hybrid MRV + Degree
+            '''import numpy as np
+from typing import Tuple, Optional
+from solver.utils import get_candidates
+
+def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
+    """
+    Hybrid MRV + Degree heuristic.
+    """
+    best_cell = None
+    best_score = -1
+    
+    for row in range(9):
+        for col in range(9):
+            if board[row, col] == 0:
+                candidates = get_candidates(board, row, col)
+                mrv_score = len(candidates)
+                
+                # Calculate degree
+                degree = 0
+                for r in range(9):
+                    if board[r, col] == 0 and r != row:
+                        degree += 1
+                for c in range(9):
+                    if board[row, c] == 0 and c != col:
+                        degree += 1
+                
+                # Combined score (lower is better for MRV, higher for degree)
+                combined_score = (10 - mrv_score) + degree * 0.1
+                
+                if combined_score > best_score:
+                    best_score = combined_score
+                    best_cell = (row, col)
+    
+    return best_cell
+
+def get_heuristic_name() -> str:
+    return "mrv_degree_hybrid"
+
+def get_heuristic_description() -> str:
+    return "Hybrid MRV + Degree - combines minimum remaining values with degree heuristic"
+''',
+            
+            # Sequential with optimization
+            '''import numpy as np
+from typing import Tuple, Optional
+from solver.utils import get_candidates
+
+def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
+    """
+    Sequential search with single-candidate optimization.
+    """
+    # First, look for cells with only one candidate (forced moves)
+    for row in range(9):
+        for col in range(9):
+            if board[row, col] == 0:
+                candidates = get_candidates(board, row, col)
+                if len(candidates) == 1:
+                    return (row, col)
+    
+    # If no forced moves, use MRV
+    min_candidates = 10
+    best_cell = None
+    
+    for row in range(9):
+        for col in range(9):
+            if board[row, col] == 0:
+                candidates = get_candidates(board, row, col)
+                if len(candidates) < min_candidates:
+                    min_candidates = len(candidates)
+                    best_cell = (row, col)
+                    if min_candidates == 1:
+                        return best_cell
+    
+    return best_cell
+
+def get_heuristic_name() -> str:
+    return "forced_first_mrv"
+
+def get_heuristic_description() -> str:
+    return "Forced moves first, then MRV - prioritizes single-candidate cells"
+'''
         ]
-
-        generated = []
-        rnd = random.Random(0)
-        for _ in range(n):
-            template = rnd.choice(seeds)
-            generated.append(textwrap.dedent(template).strip() + "\n")
-
-        # Simple tweak: if we have previous solutions, append a comment to hint reuse.
-        if previous_solutions:
-            generated.append(
-                textwrap.dedent(
-                    """
-                    def color_graph(graph):
-                        # Reuse previous best but keep deterministic order.
-                        edges = graph["edges"]
-                        adj = {}
-                        for u, v in edges:
-                            adj.setdefault(u, []).append(v)
-                            adj.setdefault(v, []).append(u)
-                        # Prefer nodes with most neighbors first.
-                        order = sorted(adj.keys(), key=lambda n: -len(adj[n]))
-                        colors = {}
-                        for node in order:
-                            used = {colors[n] for n in adj[node] if n in colors}
-                            color = 0
-                            while color in used:
-                                color += 1
-                            colors[node] = color
-                        return colors
-                    """
-                ).strip()
-                + "\n"
-            )
-
-        return generated[:n]
-
+        
+        # Return up to n templates
+        return templates[:min(n, len(templates))]
