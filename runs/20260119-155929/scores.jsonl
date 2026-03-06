@@ -1,3 +1,0 @@
-{"step": 0, "score": -Infinity, "result": {"score": -Infinity, "error": "'nodes'"}}
-{"step": 0, "score": -Infinity, "result": {"score": -Infinity, "error": "'nodes'"}}
-{"step": 0, "score": -8.0, "result": {"score": -8.0, "details": [{"graph": "triangle", "valid": true, "colors_used": 3}, {"graph": "square", "valid": true, "colors_used": 2}, {"graph": "two_triangles", "valid": true, "colors_used": 3}]}}

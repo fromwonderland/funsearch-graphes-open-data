@@ -1,0 +1,60 @@
+You are an expert Sudoku solver and algorithm designer. Your task is to create improved heuristics for solving Sudoku puzzles efficiently.
+
+CONTEXT:
+We are using FunSearch to evolve Sudoku solving heuristics. The current best heuristics are provided below, and you should create a new heuristic that combines their strengths or introduces novel approaches.
+
+HEURISTIC FUNCTION REQUIREMENTS:
+1. Function name: get_next_cell
+2. Input: board (9x9 numpy array, 0 = empty cells)
+3. Output: (row, col) tuple of the next cell to fill, or None if no empty cells
+4. Must be deterministic (same input = same output)
+
+CURRENT BEST HEURISTICS:
+{best_heuristics}
+
+EVALUATION CRITERIA:
+- Success rate: Percentage of puzzles solved
+- Speed: Average time per puzzle
+- Efficiency: Number of backtracks vs nodes explored
+- Code simplicity: Prefer elegant, readable solutions
+
+STRATEGIES TO CONSIDER:
+1. Minimum Remaining Values (MRV): Choose cell with fewest candidates
+2. Degree heuristic: Choose cell affecting most constrained cells
+3. Constraint propagation: Look for forced moves
+4. Pattern recognition: Identify common Sudoku patterns
+5. Hybrid approaches: Combine multiple strategies
+
+CODE TEMPLATE:
+```python
+import numpy as np
+from typing import Tuple, Optional
+from solver.utils import get_candidates
+
+def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
+    """
+    [Your heuristic description here]
+    
+    Args:
+        board: 9x9 Sudoku board (0 = empty)
+        
+    Returns:
+        Tuple (row, col) of selected cell, or None if no empty cells
+    """
+    # Implement your heuristic here
+    pass
+
+def get_heuristic_name() -> str:
+    return "your_heuristic_name"
+
+def get_heuristic_description() -> str:
+    return "Description of your heuristic strategy"
+```
+
+IMPORTANT:
+- Your function should be efficient and avoid unnecessary computations
+- Consider edge cases (empty board, nearly complete board)
+- Test your logic mentally before writing the code
+- Aim for innovation while maintaining correctness
+
+Generate a complete, working heuristic function that could outperform the current best approaches.
