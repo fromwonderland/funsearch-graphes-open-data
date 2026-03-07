@@ -1,0 +1,73 @@
+{
+  "experiment_summary": {
+    "total_cycles": 10,
+    "max_cycles": 10,
+    "candidates_per_cycle": 2,
+    "start_time": 1,
+    "end_time": 10
+  },
+  "evolution_history": [
+    {
+      "cycle": 1,
+      "best_score": 658.8855980491638,
+      "num_heuristics": 1,
+      "avg_score": 658.8855980491638
+    },
+    {
+      "cycle": 2,
+      "best_score": 658.7487169361115,
+      "num_heuristics": 2,
+      "avg_score": -2284.9006415319445
+    },
+    {
+      "cycle": 3,
+      "best_score": 684.3731788349152,
+      "num_heuristics": 2,
+      "avg_score": -900.2234105825426
+    },
+    {
+      "cycle": 4,
+      "best_score": 657.9641119003296,
+      "num_heuristics": 2,
+      "avg_score": -1276.0629440498353
+    },
+    {
+      "cycle": 5,
+      "best_score": 655.1826856899261,
+      "num_heuristics": 2,
+      "avg_score": -2574.8836571550373
+    },
+    {
+      "cycle": 6,
+      "best_score": 656.2194529247283,
+      "num_heuristics": 2,
+      "avg_score": -2561.0802735376365
+    },
+    {
+      "cycle": 7,
+      "best_score": 639.5588774681091,
+      "num_heuristics": 2,
+      "avg_score": -2574.8805612659457
+    },
+    {
+      "cycle": 8,
+      "best_score": 658.8735746002197,
+      "num_heuristics": 2,
+      "avg_score": -4010.59821269989
+    },
+    {
+      "cycle": 9,
+      "best_score": 694.351665391922,
+      "num_heuristics": 2,
+      "avg_score": -1080.8641673040393
+    },
+    {
+      "cycle": 10,
+      "best_score": 657.9891947364807,
+      "num_heuristics": 2,
+      "avg_score": -1803.9454026317596
+    }
+  ],
+  "final_best_score": 694.351665391922,
+  "improvement": -0.8964033126831055
+}

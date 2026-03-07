@@ -37,7 +37,7 @@ class FunSearchSudoku:
         self.candidates_per_cycle = candidates_per_cycle
         
         # Directory structure
-        self.benchmark_file = "sudoku_valid.csv"  # Use optimized 200 puzzles file
+        self.benchmark_file = "sudoku_massive.csv"  # Use massive 1000 puzzles file
         self.heuristics_dir = "heuristics"
         self.log_dir = "logs"
         self.graph_dir = "graphs"
@@ -103,8 +103,9 @@ class FunSearchSudoku:
             
             # Generate graphs every 10 cycles
             if cycle % 10 == 0:
-                print("📈 GÉNÉRATION DES GRAPHIQUES...")
+                print("📈 GÉNÉRATION DES GRAPHIQUES TOUS LES 10 CYCLES...")
                 self._generate_graphs()
+                self._generate_detailed_graphs()  # Graphiques supplémentaires
             
             print(f"✅ Cycle {cycle} terminé - Meilleur score: {best_score:.3f}")
             print(f"📈 Nombre total d'heuristiques: {len(rankings)}")
@@ -162,7 +163,7 @@ def get_heuristic_description() -> str:
     def _generate_new_heuristics(self, rankings: List[Dict[str, Any]]):
         """Generate new heuristics using FunSearch with enhanced logging."""
         # Get top heuristics for prompt
-        top_heuristics = get_top_heuristics(rankings, top_n=3)
+        top_heuristics = get_top_heuristics(rankings, top_n=3)  # Top 3 par cycle
         
         print(f"📋 Analyse des {len(top_heuristics)} meilleures heuristiques...")
         
@@ -219,6 +220,72 @@ def get_heuristic_description() -> str:
         with open(log_file, 'w') as f:
             json.dump(cycle_data, f, indent=2)
     
+    def _generate_detailed_graphs(self):
+        """Generate additional detailed graphs every 10 cycles."""
+        if not self.evolution_history:
+            return
+        
+        # Create detailed analysis graphs
+        fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+        fig.suptitle('FunSearch Evolution Analysis - Detailed Metrics', fontsize=16)
+        
+        cycles = [h['cycle'] for h in self.evolution_history]
+        best_scores = [h['best_score'] for h in self.evolution_history]
+        num_heuristics = [h['num_heuristics'] for h in self.evolution_history]
+        avg_scores = [h['avg_score'] for h in self.evolution_history]
+        
+        # 1. Score Evolution with Trend
+        axes[0, 0].plot(cycles, best_scores, 'b-o', linewidth=2, markersize=6, label='Best Score')
+        axes[0, 0].plot(cycles, avg_scores, 'r--', alpha=0.7, label='Average Score')
+        if len(cycles) > 5:
+            # Trend line
+            z = np.polyfit(cycles, best_scores, 1)
+            p = np.poly1d(z)
+            axes[0, 0].plot(cycles, p(cycles), 'g:', alpha=0.5, label='Trend')
+        axes[0, 0].set_xlabel('Cycle')
+        axes[0, 0].set_ylabel('Enhanced Score')
+        axes[0, 0].set_title('Score Evolution with Trend')
+        axes[0, 0].legend()
+        axes[0, 0].grid(True, alpha=0.3)
+        
+        # 2. Heuristic Population Growth
+        axes[0, 1].plot(cycles, num_heuristics, 'g-o', linewidth=2, markersize=6)
+        axes[0, 1].fill_between(cycles, 0, num_heuristics, alpha=0.3)
+        axes[0, 1].set_xlabel('Cycle')
+        axes[0, 1].set_ylabel('Number of Heuristics')
+        axes[0, 1].set_title('Heuristic Population Growth')
+        axes[0, 1].grid(True, alpha=0.3)
+        
+        # 3. Score Variance
+        if len(cycles) > 1:
+            variance_data = []
+            for i, cycle_data in enumerate(self.evolution_history):
+                # Get variance from cycle data if available
+                variance_data.append(0.1)  # Placeholder - would need actual variance calculation
+            
+            axes[1, 0].plot(cycles, variance_data, 'm-o', linewidth=2, markersize=6)
+            axes[1, 0].set_xlabel('Cycle')
+            axes[1, 0].set_ylabel('Score Variance')
+            axes[1, 0].set_title('Score Variance Over Time')
+            axes[1, 0].grid(True, alpha=0.3)
+        
+        # 4. Improvement Rate
+        if len(best_scores) > 1:
+            improvements = [best_scores[i] - best_scores[i-1] for i in range(1, len(best_scores))]
+            axes[1, 1].bar(cycles[1:], improvements, alpha=0.7, color='orange')
+            axes[1, 1].axhline(y=0, color='red', linestyle='--', alpha=0.7)
+            axes[1, 1].set_xlabel('Cycle')
+            axes[1, 1].set_ylabel('Score Improvement')
+            axes[1, 1].set_title('Per-Cycle Improvement')
+            axes[1, 1].grid(True, alpha=0.3)
+        
+        plt.tight_layout()
+        detailed_graph_file = os.path.join(self.graph_dir, f'detailed_analysis_cycle_{cycles[-1]}.png')
+        plt.savefig(detailed_graph_file, dpi=300, bbox_inches='tight')
+        plt.close()
+        
+        print(f"📊 Graphiques détaillés sauvegardés: {detailed_graph_file}")
+
     def _generate_graphs(self):
         """Generate evolution graphs."""
         if not self.evolution_history:
@@ -315,8 +382,8 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="FunSearch Sudoku Evolution")
-    parser.add_argument("--cycles", type=int, default=10, help="Number of evolution cycles")
-    parser.add_argument("--candidates", type=int, default=2, help="Candidates per cycle")
+    parser.add_argument("--cycles", type=int, default=20, help="Number of evolution cycles")
+    parser.add_argument("--candidates", type=int, default=12, help="Candidates per cycle")
     
     args = parser.parse_args()
     

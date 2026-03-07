@@ -137,12 +137,12 @@ def evaluate_heuristic(heuristic_module, benchmark_boards: List[np.ndarray],
         results['average_time_per_board'] = results['total_time'] / results['total_boards']
         results['success_rate'] = results['solved_boards'] / results['total_boards']
         
-        # Enhanced scoring formula
+        # Enhanced scoring formula (NEW)
         results['enhanced_score'] = (
             1000 * results['success_rate'] 
             - 0.1 * results['total_backtracks'] 
             - 0.01 * results['total_nodes'] 
-            - results['total_time']
+            - results['total_time'] * 1000  # Convert to milliseconds
         )
     else:
         results['success_rate'] = 0.0
@@ -181,9 +181,9 @@ def evaluate_all_heuristics(heuristic_dir: str, benchmark_file: str = None) -> L
                 benchmarks[difficulty] = load_benchmark(file_path, max_puzzles=100)
         else:
             # Use main sudoku_50.csv file
-            benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=100)}
+            benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=1000)}
     else:
-        benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=100)}
+        benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=1000)}
     
     # Load heuristic modules
     heuristic_files = [f for f in os.listdir(heuristic_dir) 
