@@ -37,7 +37,7 @@ class FunSearchSudoku:
         self.candidates_per_cycle = candidates_per_cycle
         
         # Directory structure
-        self.benchmark_file = "sudoku_50.csv"  # Use optimized 200 puzzles file
+        self.benchmark_file = "sudoku_valid.csv"  # Use optimized 200 puzzles file
         self.heuristics_dir = "heuristics"
         self.log_dir = "logs"
         self.graph_dir = "graphs"
@@ -55,68 +55,66 @@ class FunSearchSudoku:
             os.makedirs(directory, exist_ok=True)
     
     def run_evolution(self):
-        """
-        Run the complete FunSearch evolution process.
-        """
-        print("Starting FunSearch Sudoku Evolution")
-        print(f"Max cycles: {self.max_cycles}")
-        print(f"Candidates per cycle: {self.candidates_per_cycle}")
-        print("=" * 50)
+        """Run the FunSearch evolution process with enhanced logging."""
+        print("🚀 DÉMARRAGE DE L'ÉVOLUTION FUNSEARCH")
+        print(f"📊 Configuration: {self.max_cycles} cycles, {self.candidates_per_cycle} candidats/cycle")
+        print("=" * 60)
         
         # Check if benchmark file exists
         if not os.path.exists(self.benchmark_file):
-            print(f"Error: Benchmark file {self.benchmark_file} not found!")
-            print("Please ensure sudoku.csv is in the current directory.")
+            print(f"❌ Erreur: Fichier benchmark {self.benchmark_file} introuvable!")
+            print("Veuillez vous assurer que sudoku_50.csv est dans le répertoire actuel.")
             return
         
-        print(f"Using benchmark file: {self.benchmark_file}")
+        # Create baseline heuristic
+        print("🔧 CRÉATION DE L'HEURISTIQUE DE BASE...")
+        self._create_baseline_heuristic()
+        print("✅ Baseline MRV créée")
         
-        # Initial evaluation
-        print("Evaluating initial heuristics...")
-        initial_results = self._evaluate_current_heuristics()
-        
-        if not initial_results:
-            print("No initial heuristics found. Creating baseline heuristic...")
-            self._create_baseline_heuristic()
-            initial_results = self._evaluate_current_heuristics()
-        
-        # Evolution loop
         for cycle in range(1, self.max_cycles + 1):
-            print(f"\n--- Cycle {cycle}/{self.max_cycles} ---")
+            print(f"\n🔄 CYCLE {cycle}/{self.max_cycles}")
+            print("-" * 40)
             
             # Evaluate current heuristics
+            print("📏 ÉVALUATION DES HEURISTIQUES ACTUELLES...")
             current_results = self._evaluate_current_heuristics()
             
             # Rank heuristics
+            print("🏆 CLASSEMENT DES HEURISTIQUES...")
             rankings = rank_heuristics(current_results)
             
             # Save results
+            print("💾 SAUVEGARDE DES RÉSULTATS...")
             self._save_cycle_results(cycle, current_results, rankings)
             
             # Generate new heuristics
-            if cycle < self.max_cycles:  # Don't generate on last cycle
+            if cycle < self.max_cycles:
+                print(f"🧪 GÉNÉRATION DE {self.candidates_per_cycle} NOUVELLE(S) HEURISTIQUE(S)...")
                 self._generate_new_heuristics(rankings)
             
             # Update evolution history
-            best_score = rankings[0]['overall'] if rankings else 0.0
+            best_score = rankings[0]['enhanced_score'] if rankings else 0.0
             self.evolution_history.append({
                 'cycle': cycle,
                 'best_score': best_score,
                 'num_heuristics': len(rankings),
-                'avg_score': np.mean([r['overall'] for r in rankings]) if rankings else 0.0
+                'avg_score': np.mean([r['enhanced_score'] for r in rankings]) if rankings else 0.0
             })
             
             # Generate graphs every 10 cycles
             if cycle % 10 == 0:
+                print("📈 GÉNÉRATION DES GRAPHIQUES...")
                 self._generate_graphs()
             
-            print(f"Best score: {best_score:.3f}")
-            print(f"Number of heuristics: {len(rankings)}")
+            print(f"✅ Cycle {cycle} terminé - Meilleur score: {best_score:.3f}")
+            print(f"📈 Nombre total d'heuristiques: {len(rankings)}")
         
-        # Final evaluation and graphs
-        print("\nEvolution complete!")
-        self._generate_final_report()
+        print("\n🎯 ÉVALUATION FINALE ET GÉNÉRATION DES GRAPHIQUES...")
         self._generate_graphs()
+        self._generate_final_report()
+        print("🎉 ÉVOLUTION TERMINÉE !")
+        print(f"📊 Rapport final sauvegardé dans {self.log_dir}/final_report.json")
+        print(f"📈 Graphiques sauvegardés dans {self.graph_dir}/evolution_summary.png")
         
     def _evaluate_current_heuristics(self) -> List[Dict[str, Any]]:
         """Evaluate all current heuristics."""
@@ -162,26 +160,31 @@ def get_heuristic_description() -> str:
         print(f"Created baseline heuristic: {baseline_file}")
     
     def _generate_new_heuristics(self, rankings: List[Dict[str, Any]]):
-        """Generate new heuristics using FunSearch."""
+        """Generate new heuristics using FunSearch with enhanced logging."""
         # Get top heuristics for prompt
         top_heuristics = get_top_heuristics(rankings, top_n=3)
         
+        print(f"📋 Analyse des {len(top_heuristics)} meilleures heuristiques...")
+        
         # Load their code for prompt
         heuristic_codes = []
-        for heuristic_file in top_heuristics:
+        for i, heuristic_file in enumerate(top_heuristics):
             file_path = os.path.join(self.heuristics_dir, heuristic_file)
             try:
                 with open(file_path, 'r') as f:
                     code = f.read()
                 heuristic_codes.append(code)
+                print(f"  ✅ Heuristic {i+1}: {heuristic_file}")
             except Exception as e:
-                print(f"Error reading {heuristic_file}: {e}")
+                print(f"  ❌ Erreur lecture {heuristic_file}: {e}")
         
-        # Create prompt
-        prompt_template_file = os.path.join(self.prompts_dir, "llm_prompt.txt")
+        # Create generator
+        prompt_template_file = os.path.join(self.prompts_dir, "llm_prompt_final.txt")
+        print("🤖 Initialisation du générateur LLM...")
+        generator = FunSearchGenerator(Path(prompt_template_file))
         
         # Generate new heuristics
-        generator = FunSearchGenerator(Path(prompt_template_file))
+        print(f"🧠 Génération de {self.candidates_per_cycle} nouvelle(s) heuristique(s) via Mistral...")
         new_heuristics = generator.generate_candidates(
             previous_solutions=heuristic_codes, 
             n=self.candidates_per_cycle
@@ -189,15 +192,19 @@ def get_heuristic_description() -> str:
         
         # Save new heuristics
         current_cycle = len(self.evolution_history) + 1
+        print(f"💾 Sauvegarde des heuristiques du cycle {current_cycle}...")
+        
         for i, heuristic_code in enumerate(new_heuristics):
-            heuristic_file = f"heuristic_cycle{current_cycle}_candidate{i+1}_{int(time.time())}.py"
-            file_path = os.path.join(self.heuristics_dir, heuristic_file)
-            
-            with open(file_path, 'w') as f:
-                f.write(heuristic_code)
-            
-            print(f"Generated new heuristic: {heuristic_file}")
-    
+            try:
+                heuristic_name = generator.save_heuristic_to_collection(
+                    heuristic_code, current_cycle, i+1
+                )
+                print(f"  ✅ Heuristic générée: {heuristic_name}")
+            except Exception as e:
+                print(f"  ❌ Erreur sauvegarde heuristic {i+1}: {e}")
+        
+        print(f"🎉 Génération terminée: {len(new_heuristics)} heuristiques créées")
+        
     def _save_cycle_results(self, cycle: int, results: List[Dict[str, Any]], rankings: List[Dict[str, Any]]):
         """Save results for current cycle."""
         cycle_data = {
@@ -308,8 +315,8 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="FunSearch Sudoku Evolution")
-    parser.add_argument("--cycles", type=int, default=50, help="Number of evolution cycles")
-    parser.add_argument("--candidates", type=int, default=3, help="Candidates per cycle")
+    parser.add_argument("--cycles", type=int, default=10, help="Number of evolution cycles")
+    parser.add_argument("--candidates", type=int, default=2, help="Candidates per cycle")
     
     args = parser.parse_args()
     

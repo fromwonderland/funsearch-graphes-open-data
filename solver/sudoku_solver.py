@@ -24,6 +24,16 @@ class SudokuSolver:
         self.nodes_explored = 0
         self.backtracks = 0
     
+    @property
+    def backtrack_count(self):
+        """Get the number of backtracks performed."""
+        return self.backtracks
+    
+    @property
+    def node_count(self):
+        """Get the number of nodes explored."""
+        return self.nodes_explored
+    
     def solve(self, board: np.ndarray, max_time: float = 30.0) -> bool:
         """
         Solve the Sudoku puzzle using the heuristic.

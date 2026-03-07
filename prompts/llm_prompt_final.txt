@@ -1,0 +1,37 @@
+Create a Sudoku heuristic function.
+
+FORBIDDEN PATTERNS:
+- Degree heuristic (counting row/column/box constraints)
+- MRV heuristic (counting candidate numbers)
+
+REQUIREMENTS:
+- Function name: get_next_cell
+- Input: 9x9 numpy array (0 = empty)
+- Output: (row, col) tuple or None
+- Must be COMPLETELY different from forbidden patterns
+
+INNOVATION STRATEGIES:
+1. BOX-FIRST: Find 3x3 box with fewest empty cells
+2. SPATIAL: Prioritize corners/edges over center
+3. PATTERN: Use Sudoku solving patterns
+4. SEQUENTIAL: Systematic fill order
+5. HYBRID: Combine multiple approaches
+
+CODE STRUCTURE:
+import numpy as np
+from typing import Tuple, Optional
+from solver.utils import get_candidates
+
+def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
+    # Your innovation here
+    pass
+
+def get_heuristic_name() -> str:
+    return "your_strategy"
+
+def get_heuristic_description() -> str:
+    return "Brief description"
+
+CRITICAL: Choose ONE strategy and implement with YOUR unique improvements.
+
+IMPLEMENT NOW!

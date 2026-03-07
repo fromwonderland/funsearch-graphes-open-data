@@ -5,14 +5,15 @@ Generates new Sudoku solving heuristics using LLM with fallback to offline metho
 """
 
 from __future__ import annotations
-
-import json
 import os
+import json
+import urllib.request
 import pathlib
 import random
+import time
+import hashlib
 import textwrap
 import urllib.error
-import urllib.request
 from typing import List, Optional
 
 
@@ -28,9 +29,34 @@ class FunSearchGenerator:
     ):
         self.prompt_path = prompt_path
         self.prompt = prompt_path.read_text(encoding="utf-8")
+        # Check priority order: final > opposition > ultra > mistral > minimal > forced > optimized > standard
+        final_prompt = prompt_path.with_name("llm_prompt_final.txt")
+        opposition_prompt = prompt_path.with_name("llm_prompt_opposition.txt")
+        ultra_prompt = prompt_path.with_name("llm_prompt_ultra.txt")
+        mistral_prompt = prompt_path.with_name("llm_prompt_mistral.txt")
+        minimal_prompt = prompt_path.with_name("llm_prompt_minimal.txt")
+        forced_prompt = prompt_path.with_name("llm_prompt_forced.txt")
+        optimized_prompt = prompt_path.with_name("llm_prompt_optimized.txt")
+        
+        if final_prompt.exists():
+            self.prompt = final_prompt.read_text(encoding="utf-8")
+        elif opposition_prompt.exists():
+            self.prompt = opposition_prompt.read_text(encoding="utf-8")
+        elif ultra_prompt.exists():
+            self.prompt = ultra_prompt.read_text(encoding="utf-8")
+        elif mistral_prompt.exists():
+            self.prompt = mistral_prompt.read_text(encoding="utf-8")
+        elif minimal_prompt.exists():
+            self.prompt = minimal_prompt.read_text(encoding="utf-8")
+        elif forced_prompt.exists():
+            self.prompt = forced_prompt.read_text(encoding="utf-8")
+        elif optimized_prompt.exists():
+            self.prompt = optimized_prompt.read_text(encoding="utf-8")
+        else:
+            self.prompt = prompt_path.read_text(encoding="utf-8")
         self.use_ollama = use_ollama if use_ollama is not None else (os.getenv("FUNSEARCH_USE_OLLAMA", "1") == "1")
         self.ollama_base_url = ollama_base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-        self.ollama_model = ollama_model or os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
+        self.ollama_model = ollama_model or os.getenv("OLLAMA_MODEL", "mistral:7b")
         self.ollama_timeout_s = float(os.getenv("OLLAMA_TIMEOUT_S", str(ollama_timeout_s)))
 
     def generate_candidates(
@@ -60,10 +86,11 @@ class FunSearchGenerator:
             "CRITICAL: Never return None when empty cells exist - this causes infinite loops in the solver."
         )
         reinject = ""
-        if previous_solutions:
-            reinject = "\n\nPrevious best solution(s) (for improvement, do NOT copy blindly):\n" + "\n\n".join(
-                previous_solutions[:2]
-            )
+        # Désactiver reinject pour forcer la créativité avec Mistral
+        # if previous_solutions:
+        #     reinject = "\n\nPrevious best solution(s) (for improvement, do NOT copy blindly):\n" + "\n\n".join(
+        #         previous_solutions[:2]
+        #     )
 
         user_prompt = (
             self.prompt
@@ -82,7 +109,7 @@ class FunSearchGenerator:
                 "system": system,
                 "stream": False,
                 "options": {
-                    "temperature": 0.4 if i == 0 else 0.6,
+                    "temperature": 1.2 if i == 0 else 1.5,
                     "top_p": 0.9,
                     "num_predict": 512,
                 },
@@ -313,4 +340,69 @@ def get_heuristic_description() -> str:
             )
 
         return generated[:n]
+
+    def save_heuristic_to_collection(self, code: str, cycle: int, candidate_id: int) -> str:
+        """
+        Save a new heuristic to the collection file instead of separate files.
+        
+        Args:
+            code: The generated heuristic code
+            cycle: Current cycle number
+            candidate_id: Candidate identifier
+            
+        Returns:
+            Function name of the saved heuristic
+        """
+        # Extract function name from code
+        func_name = "unknown"
+        for line in code.split('\n'):
+            if 'def get_heuristic_name()' in line:
+                # Find the return statement in the next few lines
+                lines_after = code.split('\n')[code.split('\n').index(line):]
+                for next_line in lines_after:
+                    if 'return' in next_line and '"' in next_line:
+                        func_name = next_line.split('"')[1]
+                        break
+                break
+        
+        # Generate unique function name
+        unique_name = f"heuristic_cycle{cycle}_candidate{candidate_id}_{func_name}"
+        
+        # Create collection file if it doesn't exist
+        collection_file = self.prompt_path.parent.parent / "heuristics" / "heuristic_collection.py"
+        
+        # Read existing collection
+        if collection_file.exists():
+            with open(collection_file, 'r', encoding='utf-8') as f:
+                collection_content = f.read()
+        else:
+            collection_content = '''"""
+Collection of generated Sudoku heuristics
+"""
+
+import numpy as np
+from typing import Tuple, Optional
+from solver.utils import get_candidates
+
+'''
+        
+        # Add the new heuristic to collection
+        new_heuristic_code = f'''
+# Heuristic: {unique_name} (Cycle {cycle}, Candidate {candidate_id})
+{code}
+
+def get_next_cell_{unique_name}(board: np.ndarray) -> Optional[Tuple[int, int]]:
+    """Wrapper for {unique_name}"""
+    return get_next_cell(board)
+
+'''
+        
+        collection_content += new_heuristic_code
+        
+        # Save collection
+        with open(collection_file, 'w', encoding='utf-8') as f:
+            f.write(collection_content)
+        
+        print(f"✅ Heuristic '{unique_name}' added to collection")
+        return unique_name
 

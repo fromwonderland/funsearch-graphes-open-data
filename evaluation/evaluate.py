@@ -58,9 +58,9 @@ def load_benchmark(file_path: str, max_puzzles: int = 1000) -> List[np.ndarray]:
 
 
 def evaluate_heuristic(heuristic_module, benchmark_boards: List[np.ndarray], 
-                       max_time_per_board: float = 1.0) -> Dict[str, Any]:
+                       max_time_per_board: float = 0.1) -> Dict[str, Any]:
     """
-    Evaluate a single heuristic on the benchmark.
+    Evaluate a single heuristic on the benchmark with enhanced scoring.
     
     Args:
         heuristic_module: Imported heuristic module
@@ -78,6 +78,9 @@ def evaluate_heuristic(heuristic_module, benchmark_boards: List[np.ndarray],
         'timeout_boards': 0,
         'total_time': 0.0,
         'average_time_per_board': 0.0,
+        'total_backtracks': 0,
+        'total_nodes': 0,
+        'enhanced_score': 0.0,
         'board_results': []
     }
     
@@ -88,9 +91,13 @@ def evaluate_heuristic(heuristic_module, benchmark_boards: List[np.ndarray],
         start_time = time.time()
         
         try:
-            # Attempt to solve the board
+            # Attempt to solve the board with tracking
             solved = solver.solve(board_copy, max_time=max_time_per_board)
             solving_time = time.time() - start_time
+            
+            # Get solver statistics
+            backtracks = getattr(solver, 'backtrack_count', 0)
+            nodes = getattr(solver, 'node_count', 0)
             
             if solved and is_valid_solution(board_copy):
                 results['solved_boards'] += 1
@@ -102,26 +109,44 @@ def evaluate_heuristic(heuristic_module, benchmark_boards: List[np.ndarray],
         except TimeoutError:
             results['timeout_boards'] += 1
             solving_time = max_time_per_board
+            backtracks = getattr(solver, 'backtrack_count', 0)
+            nodes = getattr(solver, 'node_count', 0)
             status = 'timeout'
             
         except Exception as e:
             results['failed_boards'] += 1
             solving_time = time.time() - start_time
+            backtracks = getattr(solver, 'backtrack_count', 0)
+            nodes = getattr(solver, 'node_count', 0)
             status = f'error: {str(e)}'
         
         results['total_time'] += solving_time
+        results['total_backtracks'] += backtracks
+        results['total_nodes'] += nodes
+        
         results['board_results'].append({
             'board_index': i,
             'status': status,
             'time': solving_time,
+            'backtracks': backtracks,
+            'nodes': nodes,
             'empty_cells': int(np.sum(board == 0))
         })
     
     if results['total_boards'] > 0:
         results['average_time_per_board'] = results['total_time'] / results['total_boards']
         results['success_rate'] = results['solved_boards'] / results['total_boards']
+        
+        # Enhanced scoring formula
+        results['enhanced_score'] = (
+            1000 * results['success_rate'] 
+            - 0.1 * results['total_backtracks'] 
+            - 0.01 * results['total_nodes'] 
+            - results['total_time']
+        )
     else:
         results['success_rate'] = 0.0
+        results['enhanced_score'] = 0.0
     
     return results
 
@@ -156,9 +181,9 @@ def evaluate_all_heuristics(heuristic_dir: str, benchmark_file: str = None) -> L
                 benchmarks[difficulty] = load_benchmark(file_path, max_puzzles=100)
         else:
             # Use main sudoku_50.csv file
-            benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=50)}
+            benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=100)}
     else:
-        benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=50)}
+        benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=100)}
     
     # Load heuristic modules
     heuristic_files = [f for f in os.listdir(heuristic_dir) 

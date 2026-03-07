@@ -100,7 +100,7 @@ def calculate_robustness_score(results: List[Dict[str, Any]]) -> float:
 def calculate_overall_score(evaluation_results: List[Dict[str, Any]], 
                           heuristic_file: str) -> Dict[str, float]:
     """
-    Calculate overall score for a heuristic combining multiple factors.
+    Calculate overall score for a heuristic using enhanced scoring.
     
     Args:
         evaluation_results: List of evaluation results for the heuristic
@@ -113,27 +113,34 @@ def calculate_overall_score(evaluation_results: List[Dict[str, Any]],
     heuristic_results = [r for r in evaluation_results if r.get('heuristic_file') == heuristic_file]
     
     if not heuristic_results:
-        return {'overall': 0.0, 'performance': 0.0, 'complexity': 0.5, 'robustness': 0.0}
+        return {'enhanced_score': 0.0, 'performance': 0.0, 'complexity': 0.5, 'robustness': 0.0}
     
-    # Performance score (average across all difficulties)
+    # Use enhanced_score from evaluation if available
+    if 'enhanced_score' in heuristic_results[0]:
+        enhanced_score = heuristic_results[0]['enhanced_score']
+    else:
+        # Fallback to performance-based calculation
+        performance_scores = [calculate_performance_score(result) for result in heuristic_results]
+        avg_performance = np.mean(performance_scores)
+        complexity = calculate_complexity_score(heuristic_file)
+        complexity_score = 1.0 - complexity
+        robustness = calculate_robustness_score(heuristic_results)
+        
+        weights = {'performance': 0.5, 'complexity': 0.2, 'robustness': 0.3}
+        enhanced_score = (weights['performance'] * avg_performance + 
+                        weights['complexity'] * complexity_score + 
+                        weights['robustness'] * robustness)
+    
+    # Legacy scores for compatibility
     performance_scores = [calculate_performance_score(result) for result in heuristic_results]
     avg_performance = np.mean(performance_scores)
-    
-    # Complexity score (lower is better, so we invert)
     complexity = calculate_complexity_score(heuristic_file)
     complexity_score = 1.0 - complexity
-    
-    # Robustness score
     robustness = calculate_robustness_score(heuristic_results)
     
-    # Overall weighted score
-    weights = {'performance': 0.5, 'complexity': 0.2, 'robustness': 0.3}
-    overall = (weights['performance'] * avg_performance + 
-              weights['complexity'] * complexity_score + 
-              weights['robustness'] * robustness)
-    
     return {
-        'overall': overall,
+        'enhanced_score': enhanced_score,
+        'overall': enhanced_score,  # For backward compatibility
         'performance': avg_performance,
         'complexity': complexity_score,
         'robustness': robustness,
@@ -162,8 +169,8 @@ def rank_heuristics(evaluation_results: List[Dict[str, Any]]) -> List[Dict[str, 
             **scores
         })
     
-    # Sort by overall score (descending)
-    rankings.sort(key=lambda x: x['overall'], reverse=True)
+    # Sort by enhanced_score (descending)
+    rankings.sort(key=lambda x: x['enhanced_score'], reverse=True)
     
     # Add rank
     for i, ranking in enumerate(rankings):

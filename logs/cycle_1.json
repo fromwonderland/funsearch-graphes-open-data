@@ -1,1952 +1,836 @@
 {
   "cycle": 1,
-  "timestamp": 1772889547.1971636,
+  "timestamp": 1772920927.3768227,
   "results": [
     {
       "heuristic_name": "mrv_baseline",
-      "total_boards": 50,
-      "solved_boards": 50,
+      "total_boards": 100,
+      "solved_boards": 100,
       "failed_boards": 0,
       "timeout_boards": 0,
-      "total_time": 0.24714899063110352,
-      "average_time_per_board": 0.0049429798126220705,
+      "total_time": 0.9744019508361816,
+      "average_time_per_board": 0.009744019508361816,
+      "total_backtracks": 2660,
+      "total_nodes": 7414,
+      "enhanced_score": 658.8855980491638,
       "board_results": [
         {
           "board_index": 0,
           "status": "solved",
-          "time": 0.0042629241943359375,
-          "empty_cells": 49
+          "time": 0.013891935348510742,
+          "backtracks": 74,
+          "nodes": 116,
+          "empty_cells": 46
         },
         {
           "board_index": 1,
           "status": "solved",
-          "time": 0.008505821228027344,
-          "empty_cells": 48
+          "time": 0.015362739562988281,
+          "backtracks": 49,
+          "nodes": 96,
+          "empty_cells": 50
         },
         {
           "board_index": 2,
           "status": "solved",
-          "time": 0.004830837249755859,
+          "time": 0.0031282901763916016,
+          "backtracks": 37,
+          "nodes": 81,
           "empty_cells": 46
         },
         {
           "board_index": 3,
           "status": "solved",
-          "time": 0.0049474239349365234,
-          "empty_cells": 47
+          "time": 0.009537458419799805,
+          "backtracks": 0,
+          "nodes": 45,
+          "empty_cells": 45
         },
         {
           "board_index": 4,
           "status": "solved",
-          "time": 0.006010293960571289,
-          "empty_cells": 45
+          "time": 0.0019025802612304688,
+          "backtracks": 0,
+          "nodes": 48,
+          "empty_cells": 48
         },
         {
           "board_index": 5,
           "status": "solved",
-          "time": 0.004029512405395508,
-          "empty_cells": 46
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 45,
+          "empty_cells": 45
         },
         {
           "board_index": 6,
           "status": "solved",
-          "time": 0.005026578903198242,
-          "empty_cells": 46
+          "time": 0.03523826599121094,
+          "backtracks": 119,
+          "nodes": 162,
+          "empty_cells": 55
         },
         {
           "board_index": 7,
           "status": "solved",
-          "time": 0.007579326629638672,
-          "empty_cells": 47
+          "time": 0.009999752044677734,
+          "backtracks": 0,
+          "nodes": 50,
+          "empty_cells": 50
         },
         {
           "board_index": 8,
           "status": "solved",
-          "time": 0.0010230541229248047,
-          "empty_cells": 47
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 51,
+          "empty_cells": 51
         },
         {
           "board_index": 9,
           "status": "solved",
           "time": 0.0,
+          "backtracks": 3,
+          "nodes": 49,
           "empty_cells": 47
         },
         {
           "board_index": 10,
           "status": "solved",
-          "time": 0.006707668304443359,
-          "empty_cells": 49
+          "time": 0.029526948928833008,
+          "backtracks": 44,
+          "nodes": 90,
+          "empty_cells": 50
         },
         {
           "board_index": 11,
           "status": "solved",
-          "time": 0.008420705795288086,
-          "empty_cells": 47
+          "time": 0.005476951599121094,
+          "backtracks": 0,
+          "nodes": 49,
+          "empty_cells": 49
         },
         {
           "board_index": 12,
           "status": "solved",
-          "time": 0.006270885467529297,
+          "time": 0.00451970100402832,
+          "backtracks": 0,
+          "nodes": 47,
           "empty_cells": 47
         },
         {
           "board_index": 13,
           "status": "solved",
-          "time": 0.0028069019317626953,
-          "empty_cells": 48
+          "time": 0.012600183486938477,
+          "backtracks": 0,
+          "nodes": 49,
+          "empty_cells": 49
         },
         {
           "board_index": 14,
           "status": "solved",
-          "time": 0.007689952850341797,
-          "empty_cells": 48
+          "time": 0.002010345458984375,
+          "backtracks": 18,
+          "nodes": 62,
+          "empty_cells": 45
         },
         {
           "board_index": 15,
           "status": "solved",
-          "time": 0.0033025741577148438,
+          "time": 0.012374162673950195,
+          "backtracks": 5,
+          "nodes": 51,
           "empty_cells": 47
         },
         {
           "board_index": 16,
           "status": "solved",
-          "time": 0.004079103469848633,
-          "empty_cells": 47
+          "time": 0.010764837265014648,
+          "backtracks": 49,
+          "nodes": 101,
+          "empty_cells": 55
         },
         {
           "board_index": 17,
           "status": "solved",
-          "time": 0.0022783279418945312,
-          "empty_cells": 48
+          "time": 0.0062177181243896484,
+          "backtracks": 0,
+          "nodes": 45,
+          "empty_cells": 45
         },
         {
           "board_index": 18,
           "status": "solved",
-          "time": 0.002117156982421875,
-          "empty_cells": 47
+          "time": 0.006177663803100586,
+          "backtracks": 4,
+          "nodes": 51,
+          "empty_cells": 48
         },
         {
           "board_index": 19,
           "status": "solved",
-          "time": 0.006333112716674805,
-          "empty_cells": 47
+          "time": 0.0039255619049072266,
+          "backtracks": 0,
+          "nodes": 54,
+          "empty_cells": 54
         },
         {
           "board_index": 20,
           "status": "solved",
-          "time": 0.006730556488037109,
-          "empty_cells": 46
+          "time": 0.009253978729248047,
+          "backtracks": 0,
+          "nodes": 54,
+          "empty_cells": 54
         },
         {
           "board_index": 21,
           "status": "solved",
-          "time": 0.006874799728393555,
-          "empty_cells": 46
+          "time": 0.018189668655395508,
+          "backtracks": 162,
+          "nodes": 205,
+          "empty_cells": 52
         },
         {
           "board_index": 22,
           "status": "solved",
-          "time": 0.006284952163696289,
-          "empty_cells": 47
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 45,
+          "empty_cells": 45
         },
         {
           "board_index": 23,
           "status": "solved",
-          "time": 0.00927114486694336,
-          "empty_cells": 48
+          "time": 0.018625259399414062,
+          "backtracks": 0,
+          "nodes": 55,
+          "empty_cells": 55
         },
         {
           "board_index": 24,
           "status": "solved",
-          "time": 0.002026081085205078,
-          "empty_cells": 47
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 48,
+          "empty_cells": 48
         },
         {
           "board_index": 25,
           "status": "solved",
-          "time": 0.006633758544921875,
-          "empty_cells": 47
+          "time": 0.01011800765991211,
+          "backtracks": 0,
+          "nodes": 51,
+          "empty_cells": 51
         },
         {
           "board_index": 26,
           "status": "solved",
-          "time": 0.011188983917236328,
-          "empty_cells": 47
+          "time": 0.006026744842529297,
+          "backtracks": 3,
+          "nodes": 50,
+          "empty_cells": 48
         },
         {
           "board_index": 27,
           "status": "solved",
-          "time": 0.006224870681762695,
-          "empty_cells": 49
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 48,
+          "empty_cells": 48
         },
         {
           "board_index": 28,
           "status": "solved",
-          "time": 0.008353948593139648,
-          "empty_cells": 48
+          "time": 0.013308286666870117,
+          "backtracks": 24,
+          "nodes": 78,
+          "empty_cells": 55
         },
         {
           "board_index": 29,
           "status": "solved",
-          "time": 0.005915641784667969,
-          "empty_cells": 47
+          "time": 0.011061906814575195,
+          "backtracks": 24,
+          "nodes": 71,
+          "empty_cells": 49
         },
         {
           "board_index": 30,
           "status": "solved",
-          "time": 0.003535747528076172,
+          "time": 0.0028676986694335938,
+          "backtracks": 8,
+          "nodes": 53,
           "empty_cells": 46
         },
         {
           "board_index": 31,
           "status": "solved",
-          "time": 0.002004861831665039,
-          "empty_cells": 46
+          "time": 0.004408836364746094,
+          "backtracks": 0,
+          "nodes": 53,
+          "empty_cells": 53
         },
         {
           "board_index": 32,
           "status": "solved",
-          "time": 0.010626077651977539,
-          "empty_cells": 49
+          "time": 0.01030111312866211,
+          "backtracks": 0,
+          "nodes": 47,
+          "empty_cells": 47
         },
         {
           "board_index": 33,
           "status": "solved",
-          "time": 0.005190134048461914,
-          "empty_cells": 47
+          "time": 0.0003650188446044922,
+          "backtracks": 0,
+          "nodes": 49,
+          "empty_cells": 49
         },
         {
           "board_index": 34,
           "status": "solved",
-          "time": 0.0030226707458496094,
-          "empty_cells": 47
+          "time": 0.0157623291015625,
+          "backtracks": 15,
+          "nodes": 64,
+          "empty_cells": 51
         },
         {
           "board_index": 35,
           "status": "solved",
-          "time": 0.0037810802459716797,
-          "empty_cells": 46
+          "time": 0.005141258239746094,
+          "backtracks": 44,
+          "nodes": 93,
+          "empty_cells": 52
         },
         {
           "board_index": 36,
           "status": "solved",
-          "time": 0.004384517669677734,
-          "empty_cells": 47
+          "time": 0.006788015365600586,
+          "backtracks": 0,
+          "nodes": 48,
+          "empty_cells": 48
         },
         {
           "board_index": 37,
           "status": "solved",
-          "time": 0.0,
-          "empty_cells": 46
+          "time": 0.0056688785552978516,
+          "backtracks": 14,
+          "nodes": 61,
+          "empty_cells": 49
         },
         {
           "board_index": 38,
           "status": "solved",
-          "time": 0.005559444427490234,
-          "empty_cells": 46
+          "time": 0.01188349723815918,
+          "backtracks": 6,
+          "nodes": 53,
+          "empty_cells": 49
         },
         {
           "board_index": 39,
           "status": "solved",
-          "time": 0.0020842552185058594,
-          "empty_cells": 46
+          "time": 0.008668184280395508,
+          "backtracks": 0,
+          "nodes": 49,
+          "empty_cells": 49
         },
         {
           "board_index": 40,
           "status": "solved",
-          "time": 0.008012056350708008,
-          "empty_cells": 49
+          "time": 0.017667293548583984,
+          "backtracks": 82,
+          "nodes": 126,
+          "empty_cells": 51
         },
         {
           "board_index": 41,
           "status": "solved",
-          "time": 0.003172636032104492,
-          "empty_cells": 47
+          "time": 0.011625289916992188,
+          "backtracks": 24,
+          "nodes": 76,
+          "empty_cells": 55
         },
         {
           "board_index": 42,
           "status": "solved",
-          "time": 0.005324125289916992,
-          "empty_cells": 50
+          "time": 0.006092071533203125,
+          "backtracks": 0,
+          "nodes": 46,
+          "empty_cells": 46
         },
         {
           "board_index": 43,
           "status": "solved",
-          "time": 0.0040361881256103516,
-          "empty_cells": 47
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 48,
+          "empty_cells": 48
         },
         {
           "board_index": 44,
           "status": "solved",
-          "time": 0.004267692565917969,
-          "empty_cells": 46
+          "time": 0.010627031326293945,
+          "backtracks": 21,
+          "nodes": 66,
+          "empty_cells": 47
         },
         {
           "board_index": 45,
           "status": "solved",
-          "time": 0.002310514450073242,
-          "empty_cells": 46
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 51,
+          "empty_cells": 51
         },
         {
           "board_index": 46,
           "status": "solved",
-          "time": 0.0009818077087402344,
-          "empty_cells": 48
+          "time": 0.020904541015625,
+          "backtracks": 13,
+          "nodes": 61,
+          "empty_cells": 50
         },
         {
           "board_index": 47,
           "status": "solved",
-          "time": 0.003762960433959961,
-          "empty_cells": 46
+          "time": 0.012649059295654297,
+          "backtracks": 50,
+          "nodes": 96,
+          "empty_cells": 51
         },
         {
           "board_index": 48,
           "status": "solved",
-          "time": 0.00538325309753418,
-          "empty_cells": 47
+          "time": 0.006101369857788086,
+          "backtracks": 0,
+          "nodes": 48,
+          "empty_cells": 48
         },
         {
           "board_index": 49,
           "status": "solved",
-          "time": 0.003982067108154297,
+          "time": 0.010359764099121094,
+          "backtracks": 3,
+          "nodes": 55,
+          "empty_cells": 53
+        },
+        {
+          "board_index": 50,
+          "status": "solved",
+          "time": 0.0,
+          "backtracks": 8,
+          "nodes": 60,
+          "empty_cells": 53
+        },
+        {
+          "board_index": 51,
+          "status": "solved",
+          "time": 0.011409759521484375,
+          "backtracks": 0,
+          "nodes": 45,
+          "empty_cells": 45
+        },
+        {
+          "board_index": 52,
+          "status": "solved",
+          "time": 0.005106687545776367,
+          "backtracks": 0,
+          "nodes": 50,
+          "empty_cells": 50
+        },
+        {
+          "board_index": 53,
+          "status": "solved",
+          "time": 0.004459381103515625,
+          "backtracks": 0,
+          "nodes": 46,
+          "empty_cells": 46
+        },
+        {
+          "board_index": 54,
+          "status": "solved",
+          "time": 0.007027626037597656,
+          "backtracks": 0,
+          "nodes": 48,
+          "empty_cells": 48
+        },
+        {
+          "board_index": 55,
+          "status": "solved",
+          "time": 0.011405229568481445,
+          "backtracks": 23,
+          "nodes": 75,
+          "empty_cells": 54
+        },
+        {
+          "board_index": 56,
+          "status": "solved",
+          "time": 0.0043926239013671875,
+          "backtracks": 10,
+          "nodes": 63,
+          "empty_cells": 55
+        },
+        {
+          "board_index": 57,
+          "status": "solved",
+          "time": 0.006285667419433594,
+          "backtracks": 0,
+          "nodes": 52,
+          "empty_cells": 52
+        },
+        {
+          "board_index": 58,
+          "status": "solved",
+          "time": 0.014010190963745117,
+          "backtracks": 0,
+          "nodes": 53,
+          "empty_cells": 53
+        },
+        {
+          "board_index": 59,
+          "status": "solved",
+          "time": 0.011780023574829102,
+          "backtracks": 51,
+          "nodes": 97,
+          "empty_cells": 51
+        },
+        {
+          "board_index": 60,
+          "status": "solved",
+          "time": 0.00401616096496582,
+          "backtracks": 0,
+          "nodes": 48,
+          "empty_cells": 48
+        },
+        {
+          "board_index": 61,
+          "status": "solved",
+          "time": 0.012349128723144531,
+          "backtracks": 47,
+          "nodes": 96,
+          "empty_cells": 52
+        },
+        {
+          "board_index": 62,
+          "status": "solved",
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 45,
+          "empty_cells": 45
+        },
+        {
+          "board_index": 63,
+          "status": "solved",
+          "time": 0.028306961059570312,
+          "backtracks": 138,
+          "nodes": 184,
+          "empty_cells": 55
+        },
+        {
+          "board_index": 64,
+          "status": "solved",
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 47,
           "empty_cells": 47
+        },
+        {
+          "board_index": 65,
+          "status": "solved",
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 54,
+          "empty_cells": 54
+        },
+        {
+          "board_index": 66,
+          "status": "solved",
+          "time": 0.016165971755981445,
+          "backtracks": 0,
+          "nodes": 52,
+          "empty_cells": 52
+        },
+        {
+          "board_index": 67,
+          "status": "solved",
+          "time": 0.006528139114379883,
+          "backtracks": 3,
+          "nodes": 52,
+          "empty_cells": 50
+        },
+        {
+          "board_index": 68,
+          "status": "solved",
+          "time": 0.0026564598083496094,
+          "backtracks": 0,
+          "nodes": 48,
+          "empty_cells": 48
+        },
+        {
+          "board_index": 69,
+          "status": "solved",
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 47,
+          "empty_cells": 47
+        },
+        {
+          "board_index": 70,
+          "status": "solved",
+          "time": 0.016373395919799805,
+          "backtracks": 0,
+          "nodes": 48,
+          "empty_cells": 48
+        },
+        {
+          "board_index": 71,
+          "status": "solved",
+          "time": 0.028786659240722656,
+          "backtracks": 232,
+          "nodes": 266,
+          "empty_cells": 54
+        },
+        {
+          "board_index": 72,
+          "status": "solved",
+          "time": 0.004433631896972656,
+          "backtracks": 0,
+          "nodes": 51,
+          "empty_cells": 51
+        },
+        {
+          "board_index": 73,
+          "status": "solved",
+          "time": 0.0942835807800293,
+          "backtracks": 657,
+          "nodes": 652,
+          "empty_cells": 52
+        },
+        {
+          "board_index": 74,
+          "status": "solved",
+          "time": 0.004006147384643555,
+          "backtracks": 0,
+          "nodes": 45,
+          "empty_cells": 45
+        },
+        {
+          "board_index": 75,
+          "status": "solved",
+          "time": 0.001728057861328125,
+          "backtracks": 16,
+          "nodes": 66,
+          "empty_cells": 52
+        },
+        {
+          "board_index": 76,
+          "status": "solved",
+          "time": 0.016896724700927734,
+          "backtracks": 28,
+          "nodes": 76,
+          "empty_cells": 49
+        },
+        {
+          "board_index": 77,
+          "status": "solved",
+          "time": 0.004540205001831055,
+          "backtracks": 43,
+          "nodes": 88,
+          "empty_cells": 47
+        },
+        {
+          "board_index": 78,
+          "status": "solved",
+          "time": 0.016124486923217773,
+          "backtracks": 12,
+          "nodes": 58,
+          "empty_cells": 49
+        },
+        {
+          "board_index": 79,
+          "status": "solved",
+          "time": 0.0065114498138427734,
+          "backtracks": 0,
+          "nodes": 46,
+          "empty_cells": 46
+        },
+        {
+          "board_index": 80,
+          "status": "solved",
+          "time": 0.006482601165771484,
+          "backtracks": 9,
+          "nodes": 59,
+          "empty_cells": 51
+        },
+        {
+          "board_index": 81,
+          "status": "solved",
+          "time": 0.011032819747924805,
+          "backtracks": 20,
+          "nodes": 70,
+          "empty_cells": 54
+        },
+        {
+          "board_index": 82,
+          "status": "solved",
+          "time": 0.009717464447021484,
+          "backtracks": 0,
+          "nodes": 52,
+          "empty_cells": 52
+        },
+        {
+          "board_index": 83,
+          "status": "solved",
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 47,
+          "empty_cells": 47
+        },
+        {
+          "board_index": 84,
+          "status": "solved",
+          "time": 0.012349605560302734,
+          "backtracks": 13,
+          "nodes": 59,
+          "empty_cells": 47
+        },
+        {
+          "board_index": 85,
+          "status": "solved",
+          "time": 0.010592460632324219,
+          "backtracks": 29,
+          "nodes": 80,
+          "empty_cells": 54
+        },
+        {
+          "board_index": 86,
+          "status": "solved",
+          "time": 0.005839109420776367,
+          "backtracks": 0,
+          "nodes": 52,
+          "empty_cells": 52
+        },
+        {
+          "board_index": 87,
+          "status": "solved",
+          "time": 0.009582996368408203,
+          "backtracks": 33,
+          "nodes": 83,
+          "empty_cells": 51
+        },
+        {
+          "board_index": 88,
+          "status": "solved",
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 48,
+          "empty_cells": 48
+        },
+        {
+          "board_index": 89,
+          "status": "solved",
+          "time": 0.036022186279296875,
+          "backtracks": 223,
+          "nodes": 256,
+          "empty_cells": 49
+        },
+        {
+          "board_index": 90,
+          "status": "solved",
+          "time": 0.008711576461791992,
+          "backtracks": 3,
+          "nodes": 55,
+          "empty_cells": 53
+        },
+        {
+          "board_index": 91,
+          "status": "solved",
+          "time": 0.004015684127807617,
+          "backtracks": 0,
+          "nodes": 55,
+          "empty_cells": 55
+        },
+        {
+          "board_index": 92,
+          "status": "solved",
+          "time": 0.01290583610534668,
+          "backtracks": 15,
+          "nodes": 67,
+          "empty_cells": 54
+        },
+        {
+          "board_index": 93,
+          "status": "solved",
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 46,
+          "empty_cells": 46
+        },
+        {
+          "board_index": 94,
+          "status": "solved",
+          "time": 0.0,
+          "backtracks": 0,
+          "nodes": 46,
+          "empty_cells": 46
+        },
+        {
+          "board_index": 95,
+          "status": "solved",
+          "time": 0.01850128173828125,
+          "backtracks": 49,
+          "nodes": 99,
+          "empty_cells": 55
+        },
+        {
+          "board_index": 96,
+          "status": "solved",
+          "time": 0.012074708938598633,
+          "backtracks": 3,
+          "nodes": 52,
+          "empty_cells": 50
+        },
+        {
+          "board_index": 97,
+          "status": "solved",
+          "time": 0.01704883575439453,
+          "backtracks": 34,
+          "nodes": 82,
+          "empty_cells": 55
+        },
+        {
+          "board_index": 98,
+          "status": "solved",
+          "time": 0.0,
+          "backtracks": 4,
+          "nodes": 50,
+          "empty_cells": 47
+        },
+        {
+          "board_index": 99,
+          "status": "solved",
+          "time": 0.022820234298706055,
+          "backtracks": 62,
+          "nodes": 108,
+          "empty_cells": 54
         }
       ],
       "success_rate": 1.0,
       "difficulty": "main",
       "heuristic_file": "heuristic_0.py",
-      "benchmark_size": 50
-    },
-    {
-      "heuristic_name": "degree_heuristic",
-      "total_boards": 50,
-      "solved_boards": 0,
-      "failed_boards": 0,
-      "timeout_boards": 50,
-      "total_time": 50.0,
-      "average_time_per_board": 1.0,
-      "board_results": [
-        {
-          "board_index": 0,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 1,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 2,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 3,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 4,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 45
-        },
-        {
-          "board_index": 5,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 6,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 7,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 8,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 9,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 10,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 11,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 12,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 13,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 14,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 15,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 16,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 17,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 18,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 19,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 20,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 21,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 22,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 23,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 24,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 25,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 26,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 27,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 28,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 29,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 30,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 31,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 32,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 33,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 34,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 35,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 36,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 37,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 38,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 39,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 40,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 41,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 42,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 50
-        },
-        {
-          "board_index": 43,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 44,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 45,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 46,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 47,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 48,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 49,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        }
-      ],
-      "success_rate": 0.0,
-      "difficulty": "main",
-      "heuristic_file": "heuristic_cycle1_candidate1_1772836185.py",
-      "benchmark_size": 50
-    },
-    {
-      "heuristic_name": "degree_heuristic",
-      "total_boards": 50,
-      "solved_boards": 0,
-      "failed_boards": 0,
-      "timeout_boards": 50,
-      "total_time": 50.0,
-      "average_time_per_board": 1.0,
-      "board_results": [
-        {
-          "board_index": 0,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 1,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 2,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 3,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 4,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 45
-        },
-        {
-          "board_index": 5,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 6,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 7,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 8,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 9,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 10,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 11,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 12,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 13,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 14,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 15,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 16,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 17,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 18,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 19,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 20,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 21,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 22,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 23,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 24,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 25,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 26,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 27,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 28,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 29,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 30,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 31,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 32,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 33,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 34,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 35,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 36,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 37,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 38,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 39,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 40,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 41,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 42,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 50
-        },
-        {
-          "board_index": 43,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 44,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 45,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 46,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 47,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 48,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 49,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        }
-      ],
-      "success_rate": 0.0,
-      "difficulty": "main",
-      "heuristic_file": "heuristic_cycle1_candidate2_1772836185.py",
-      "benchmark_size": 50
-    },
-    {
-      "heuristic_name": "degree_heuristic",
-      "total_boards": 50,
-      "solved_boards": 0,
-      "failed_boards": 0,
-      "timeout_boards": 50,
-      "total_time": 50.0,
-      "average_time_per_board": 1.0,
-      "board_results": [
-        {
-          "board_index": 0,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 1,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 2,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 3,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 4,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 45
-        },
-        {
-          "board_index": 5,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 6,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 7,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 8,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 9,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 10,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 11,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 12,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 13,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 14,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 15,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 16,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 17,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 18,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 19,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 20,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 21,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 22,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 23,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 24,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 25,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 26,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 27,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 28,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 29,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 30,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 31,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 32,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 33,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 34,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 35,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 36,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 37,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 38,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 39,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 40,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 41,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 42,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 50
-        },
-        {
-          "board_index": 43,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 44,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 45,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 46,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 47,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 48,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 49,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        }
-      ],
-      "success_rate": 0.0,
-      "difficulty": "main",
-      "heuristic_file": "heuristic_cycle2_candidate1_1772836272.py",
-      "benchmark_size": 50
-    },
-    {
-      "heuristic_name": "degree_heuristic",
-      "total_boards": 50,
-      "solved_boards": 0,
-      "failed_boards": 0,
-      "timeout_boards": 50,
-      "total_time": 50.0,
-      "average_time_per_board": 1.0,
-      "board_results": [
-        {
-          "board_index": 0,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 1,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 2,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 3,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 4,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 45
-        },
-        {
-          "board_index": 5,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 6,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 7,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 8,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 9,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 10,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 11,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 12,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 13,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 14,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 15,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 16,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 17,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 18,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 19,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 20,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 21,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 22,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 23,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 24,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 25,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 26,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 27,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 28,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 29,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 30,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 31,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 32,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 33,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 34,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 35,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 36,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 37,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 38,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 39,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 40,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 41,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 42,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 50
-        },
-        {
-          "board_index": 43,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 44,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 45,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 46,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 47,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 48,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 49,
-          "status": "timeout",
-          "time": 1.0,
-          "empty_cells": 47
-        }
-      ],
-      "success_rate": 0.0,
-      "difficulty": "main",
-      "heuristic_file": "heuristic_cycle2_candidate2_1772836272.py",
-      "benchmark_size": 50
-    },
-    {
-      "heuristic_name": "sequential_search",
-      "total_boards": 50,
-      "solved_boards": 50,
-      "failed_boards": 0,
-      "timeout_boards": 0,
-      "total_time": 1.181236743927002,
-      "average_time_per_board": 0.02362473487854004,
-      "board_results": [
-        {
-          "board_index": 0,
-          "status": "solved",
-          "time": 0.014150381088256836,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 1,
-          "status": "solved",
-          "time": 0.02588939666748047,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 2,
-          "status": "solved",
-          "time": 0.04017043113708496,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 3,
-          "status": "solved",
-          "time": 0.016564369201660156,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 4,
-          "status": "solved",
-          "time": 0.009911537170410156,
-          "empty_cells": 45
-        },
-        {
-          "board_index": 5,
-          "status": "solved",
-          "time": 0.013746500015258789,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 6,
-          "status": "solved",
-          "time": 0.018192768096923828,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 7,
-          "status": "solved",
-          "time": 0.011682748794555664,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 8,
-          "status": "solved",
-          "time": 0.019822120666503906,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 9,
-          "status": "solved",
-          "time": 0.006913423538208008,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 10,
-          "status": "solved",
-          "time": 0.019505977630615234,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 11,
-          "status": "solved",
-          "time": 0.014127731323242188,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 12,
-          "status": "solved",
-          "time": 0.015854597091674805,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 13,
-          "status": "solved",
-          "time": 0.015331268310546875,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 14,
-          "status": "solved",
-          "time": 0.2201392650604248,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 15,
-          "status": "solved",
-          "time": 0.01469111442565918,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 16,
-          "status": "solved",
-          "time": 0.010538816452026367,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 17,
-          "status": "solved",
-          "time": 0.01304936408996582,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 18,
-          "status": "solved",
-          "time": 0.007855653762817383,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 19,
-          "status": "solved",
-          "time": 0.020598649978637695,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 20,
-          "status": "solved",
-          "time": 0.010050535202026367,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 21,
-          "status": "solved",
-          "time": 0.009145975112915039,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 22,
-          "status": "solved",
-          "time": 0.021939754486083984,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 23,
-          "status": "solved",
-          "time": 0.029817819595336914,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 24,
-          "status": "solved",
-          "time": 0.018617868423461914,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 25,
-          "status": "solved",
-          "time": 0.011572837829589844,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 26,
-          "status": "solved",
-          "time": 0.014888763427734375,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 27,
-          "status": "solved",
-          "time": 0.06180453300476074,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 28,
-          "status": "solved",
-          "time": 0.05560159683227539,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 29,
-          "status": "solved",
-          "time": 0.011253595352172852,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 30,
-          "status": "solved",
-          "time": 0.03252148628234863,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 31,
-          "status": "solved",
-          "time": 0.0020279884338378906,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 32,
-          "status": "solved",
-          "time": 0.08691906929016113,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 33,
-          "status": "solved",
-          "time": 0.016867399215698242,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 34,
-          "status": "solved",
-          "time": 0.006134986877441406,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 35,
-          "status": "solved",
-          "time": 0.011035919189453125,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 36,
-          "status": "solved",
-          "time": 0.023400545120239258,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 37,
-          "status": "solved",
-          "time": 0.012143850326538086,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 38,
-          "status": "solved",
-          "time": 0.008736610412597656,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 39,
-          "status": "solved",
-          "time": 0.023873567581176758,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 40,
-          "status": "solved",
-          "time": 0.014106512069702148,
-          "empty_cells": 49
-        },
-        {
-          "board_index": 41,
-          "status": "solved",
-          "time": 0.04959726333618164,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 42,
-          "status": "solved",
-          "time": 0.02684187889099121,
-          "empty_cells": 50
-        },
-        {
-          "board_index": 43,
-          "status": "solved",
-          "time": 0.0227203369140625,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 44,
-          "status": "solved",
-          "time": 0.010251522064208984,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 45,
-          "status": "solved",
-          "time": 0.010859012603759766,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 46,
-          "status": "solved",
-          "time": 0.007309913635253906,
-          "empty_cells": 48
-        },
-        {
-          "board_index": 47,
-          "status": "solved",
-          "time": 0.027489185333251953,
-          "empty_cells": 46
-        },
-        {
-          "board_index": 48,
-          "status": "solved",
-          "time": 0.006216526031494141,
-          "empty_cells": 47
-        },
-        {
-          "board_index": 49,
-          "status": "solved",
-          "time": 0.008753776550292969,
-          "empty_cells": 47
-        }
-      ],
-      "success_rate": 1.0,
-      "difficulty": "main",
-      "heuristic_file": "heuristic_template.py",
-      "benchmark_size": 50
+      "benchmark_size": 100
     }
   ],
   "rankings": [
     {
       "heuristic_file": "heuristic_0.py",
-      "overall": 0.8999604561614991,
-      "performance": 0.9999505702018738,
+      "enhanced_score": 658.8855980491638,
+      "overall": 658.8855980491638,
+      "performance": 0.9999025598049164,
       "complexity": 0.5,
-      "robustness": 0.9999505702018738,
+      "robustness": 0.9999025598049164,
       "num_evaluations": 1,
       "rank": 1
-    },
-    {
-      "heuristic_file": "heuristic_template.py",
-      "overall": 0.8998110021209718,
-      "performance": 0.9997637526512146,
-      "complexity": 0.5,
-      "robustness": 0.9997637526512146,
-      "num_evaluations": 1,
-      "rank": 2
-    },
-    {
-      "heuristic_file": "heuristic_cycle1_candidate1_1772836185.py",
-      "overall": 0.1,
-      "performance": 0.0,
-      "complexity": 0.5,
-      "robustness": 0.0,
-      "num_evaluations": 1,
-      "rank": 3
-    },
-    {
-      "heuristic_file": "heuristic_cycle2_candidate2_1772836272.py",
-      "overall": 0.1,
-      "performance": 0.0,
-      "complexity": 0.5,
-      "robustness": 0.0,
-      "num_evaluations": 1,
-      "rank": 4
-    },
-    {
-      "heuristic_file": "heuristic_cycle1_candidate2_1772836185.py",
-      "overall": 0.1,
-      "performance": 0.0,
-      "complexity": 0.5,
-      "robustness": 0.0,
-      "num_evaluations": 1,
-      "rank": 5
-    },
-    {
-      "heuristic_file": "heuristic_cycle2_candidate1_1772836272.py",
-      "overall": 0.1,
-      "performance": 0.0,
-      "complexity": 0.5,
-      "robustness": 0.0,
-      "num_evaluations": 1,
-      "rank": 6
     }
   ],
   "evolution_summary": null
