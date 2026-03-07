@@ -1,5 +1,7 @@
 """
-FunSearch Generator - LLM-based heuristic generation for Sudoku
+FunSearch Generator for Sudoku heuristics
+
+Generates new Sudoku solving heuristics using LLM with fallback to offline methods.
 """
 
 from __future__ import annotations
@@ -11,322 +13,153 @@ import random
 import textwrap
 import urllib.error
 import urllib.request
-from typing import List, Optional, Dict, Any
-
-try:
-    from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
-    import torch
-    TRANSFORMERS_AVAILABLE = True
-except ImportError:
-    TRANSFORMERS_AVAILABLE = False
+from typing import List, Optional
 
 
 class FunSearchGenerator:
-    """
-    Generates new Sudoku heuristics using LLM (CodeT5) or templates
-    """
-    
     def __init__(
         self,
-        prompt_path: Optional[pathlib.Path] = None,
+        prompt_path: pathlib.Path,
         *,
-        use_llm: bool = True,
-        model_name: str = "Salesforce/codet5-small"
+        use_ollama: bool | None = None,
+        ollama_base_url: str | None = None,
+        ollama_model: str | None = None,
+        ollama_timeout_s: float = 90.0,
     ):
-        """
-        Initialize LLM generator.
-        
-        Args:
-            prompt_path: Path to prompt file (optional)
-            use_llm: Whether to use LLM or template-based generation
-            model_name: HuggingFace model name for LLM
-        """
         self.prompt_path = prompt_path
-        self.use_llm = use_llm and TRANSFORMERS_AVAILABLE
-        self.model_name = model_name
-        
-        if self.use_llm:
-            print(f"Loading LLM: {self.model_name}")
-            try:
-                self.device = "cuda" if torch.cuda.is_available() else "cpu"
-                self.tokenizer = AutoTokenizer.from_pretrained(self.model_name)
-                self.model = AutoModelForSeq2SeqLM.from_pretrained(self.model_name)
-                self.model.to(self.device)
-                
-                # Add padding token if needed
-                if self.tokenizer.pad_token is None:
-                    self.tokenizer.pad_token = self.tokenizer.eos_token
-                    
-                print(f"LLM loaded successfully on {self.device}")
-            except Exception as e:
-                print(f"Error loading model {self.model_name}: {e}")
-                print("Falling back to template-based generation")
-                self.use_llm = False
-                self.model = None
-                self.tokenizer = None
-        else:
-            print("Using template-based generation (no LLM)")
-            self.model = None
-            self.tokenizer = None
-    
+        self.prompt = prompt_path.read_text(encoding="utf-8")
+        self.use_ollama = use_ollama if use_ollama is not None else (os.getenv("FUNSEARCH_USE_OLLAMA", "1") == "1")
+        self.ollama_base_url = ollama_base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
+        self.ollama_model = ollama_model or os.getenv("OLLAMA_MODEL", "qwen2.5:7b")
+        self.ollama_timeout_s = float(os.getenv("OLLAMA_TIMEOUT_S", str(ollama_timeout_s)))
+
     def generate_candidates(
-        self,
-        previous_solutions: List[str],
-        n: int = 3,
-        temperature: float = 0.7,
-        stop: str | None = None,
+        self, previous_solutions: Optional[List[str]] = None, n: int = 3
+    ) -> List[str]:
+        """Return Python code strings. Uses Ollama if available; falls back to offline stubs."""
+        if self.use_ollama:
+            try:
+                return self._generate_with_ollama(previous_solutions=previous_solutions, n=n)
+            except Exception:
+                # Keep demo resilient: if Ollama is down/unreachable, still run.
+                pass
+        return self._generate_offline(previous_solutions=previous_solutions, n=n)
+
+    def _generate_with_ollama(
+        self, previous_solutions: Optional[List[str]] = None, n: int = 3
     ) -> List[str]:
         """
-        Generate new heuristic candidates based on previous best solutions.
-        
-        Args:
-            previous_solutions: List of best heuristic codes
-            n: Number of new candidates to generate
-            temperature: Sampling temperature for LLM
-            stop: Stop sequence for generation
-            
-        Returns:
-            List of new heuristic code strings
+        Call Ollama local API to generate code.
+
+        Requires an Ollama service running at OLLAMA_BASE_URL (default localhost:11434).
         """
-        if self.model is None or self.tokenizer is None:
-            return self._generate_template_candidates(previous_solutions, n)
-        
-        new_candidates = []
-        
+        system = (
+            "You are an expert Sudoku solver and algorithm designer. "
+            "You generate ONLY valid Python code (no markdown fences). "
+            "Return exactly one function definition get_next_cell(board) that returns (row, col) tuple. "
+            "CRITICAL: Never return None when empty cells exist - this causes infinite loops in the solver."
+        )
+        reinject = ""
+        if previous_solutions:
+            reinject = "\n\nPrevious best solution(s) (for improvement, do NOT copy blindly):\n" + "\n\n".join(
+                previous_solutions[:2]
+            )
+
+        user_prompt = (
+            self.prompt
+            + "\n\nBoard format: board is 9x9 numpy array with 0 for empty cells."
+            + "\nReturn (row, col) of next cell to fill, or None if no empty cells."
+            + "\nCRITICAL SAFETY: Always return a valid (row, col) when empty cells exist. Never return None unless board is complete."
+            + reinject
+            + "\n\nNow output Python code only, defining get_next_cell(board) and helper functions."
+        )
+
+        outputs: List[str] = []
         for i in range(n):
+            payload = {
+                "model": self.ollama_model,
+                "prompt": user_prompt,
+                "system": system,
+                "stream": False,
+                "options": {
+                    "temperature": 0.4 if i == 0 else 0.6,
+                    "top_p": 0.9,
+                    "num_predict": 512,
+                },
+            }
+            url = self.ollama_base_url.rstrip("/") + "/api/generate"
+            req = urllib.request.Request(
+                url,
+                data=json.dumps(payload).encode("utf-8"),
+                headers={"Content-Type": "application/json"},
+                method="POST",
+            )
             try:
-                candidate = self._generate_single_candidate(previous_solutions, i)
-                if candidate and self._validate_candidate(candidate):
-                    new_candidates.append(candidate)
-                else:
-                    # Fallback to template if LLM fails
-                    fallback = self._generate_template_candidates(previous_solutions, 1)
-                    if fallback:
-                        new_candidates.extend(fallback)
-                        
-            except Exception as e:
-                print(f"Error generating candidate {i}: {e}")
-                # Use template fallback
-                fallback = self._generate_template_candidates(previous_solutions, 1)
-                if fallback:
-                    new_candidates.extend(fallback)
-        
-        return new_candidates[:n]
-    
-    def _generate_single_candidate(self, previous_solutions: List[str], candidate_id: int) -> str:
-        """Generate a single candidate using LLM."""
-        
-        # Create prompt from best solutions
-        best_solution = previous_solutions[0] if previous_solutions else ""
-        
-        prompt = f"""You are an expert Sudoku solver. Create a new heuristic function for solving Sudoku puzzles.
+                with urllib.request.urlopen(req, timeout=self.ollama_timeout_s) as resp:
+                    raw = resp.read().decode("utf-8")
+            except urllib.error.URLError as exc:
+                raise RuntimeError(f"Ollama request failed: {exc}") from exc
 
-The current best heuristic is:
-```python
-{best_solution}
-```
+            data = json.loads(raw)
+            text = (data.get("response") or "").strip()
+            outputs.append(self._sanitize_candidate_code(text))
 
-Create a NEW, IMPROVED heuristic that:
-1. Uses a different strategy (e.g., degree heuristic, constraint propagation, pattern recognition)
-2. Is efficient and well-commented
-3. Maintains the same function signature
-4. Includes get_heuristic_name() and get_heuristic_description() functions
+        # Basic contract check: ensure we have a def get_next_cell and proper imports.
+        validated = [code for code in outputs if self._looks_valid(code)]
+        if len(validated) < n:
+            # Fill rest with offline fallbacks for robustness.
+            validated.extend(
+                self._generate_offline(previous_solutions=previous_solutions, n=n - len(validated))
+            )
+        return validated[:n]
 
-Return only the complete Python code:
+    @staticmethod
+    def _sanitize_candidate_code(text: str) -> str:
+        """
+        Normalize common LLM responses into pure Python code.
 
-```python
+        Handles:
+        - ```python ... ``` fences
+        - a leading 'python' line (seen in some UIs)
+        """
+        cleaned = text.strip()
+        if cleaned.startswith("```"):
+            # ```python\n...\n```
+            parts = cleaned.split("```")
+            if len(parts) >= 3:
+                cleaned = parts[1]
+                # drop optional language tag on first line
+                cleaned_lines = cleaned.splitlines()
+                if cleaned_lines and cleaned_lines[0].strip().lower() in {"python", "py"}:
+                    cleaned = "\n".join(cleaned_lines[1:])
+            else:
+                cleaned = cleaned.replace("```", "")
+
+        # Some models respond with a first line "python"
+        lines = cleaned.splitlines()
+        if lines and lines[0].strip().lower() in {"python", "py"}:
+            cleaned = "\n".join(lines[1:])
+
+        return cleaned.strip() + "\n"
+
+    @staticmethod
+    def _looks_valid(code: str) -> bool:
+        """Heuristic: must define get_next_cell and have proper imports."""
+        lowered = code.lower()
+        return "def get_next_cell" in lowered and ("import numpy" in lowered or "from solver.utils" in lowered)
+
+    def _generate_offline(
+        self, previous_solutions: Optional[List[str]] = None, n: int = 3
+    ) -> List[str]:
+        """Offline deterministic candidates so the pipeline works without any LLM."""
+        seeds = [
+            """
 import numpy as np
 from typing import Tuple, Optional
 from solver.utils import get_candidates
 
 def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
-    # Your new heuristic implementation here
-    pass
-
-def get_heuristic_name() -> str:
-    return "your_heuristic_name"
-
-def get_heuristic_description() -> str:
-    return "Description of your heuristic strategy"
-```"""
-
-        # Tokenize input
-        inputs = self.tokenizer(
-            prompt, 
-            return_tensors="pt", 
-            truncation=True, 
-            max_length=1024,
-            padding=True
-        ).to(self.device)
-        
-        # Generate with appropriate parameters for code
-        outputs = self.model.generate(
-            **inputs,
-            max_length=512,
-            temperature=0.7,
-            do_sample=True,
-            top_p=0.95,
-            num_return_sequences=1,
-            pad_token_id=self.tokenizer.eos_token_id
-        )
-        
-        # Decode and clean output
-        generated_text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        
-        # Extract Python code from response
-        candidate_code = self._extract_python_code(generated_text)
-        
-        return candidate_code
-    
-    def _extract_python_code(self, text: str) -> str:
-        """Extract Python code from generated text."""
-        # Look for code blocks
-        if "```python" in text:
-            start = text.find("```python") + 9
-            end = text.find("```", start)
-            if end != -1:
-                return text[start:end].strip()
-        
-        # Look for any code block
-        if "```" in text:
-            start = text.find("```") + 3
-            end = text.find("```", start)
-            if end != -1:
-                code = text[start:end].strip()
-                if not code.startswith("python"):
-                    return code
-        
-        # Return the whole text if no code blocks found
-        return text.strip()
-    
-    def _validate_candidate(self, candidate_code: str) -> bool:
-        """Validate that the candidate code is syntactically correct and has required functions."""
-        try:
-            # Check syntax
-            compile(candidate_code, '<string>', 'exec')
-            
-            # Check for required functions
-            required_functions = ['get_next_cell', 'get_heuristic_name', 'get_heuristic_description']
-            for func_name in required_functions:
-                if f'def {func_name}(' not in candidate_code:
-                    return False
-            
-            return True
-            
-        except SyntaxError:
-            return False
-        except Exception:
-            return False
-    
-    def _generate_template_candidates(self, previous_solutions: List[str], n: int) -> List[str]:
-        """Generate candidates using predefined templates when LLM is not available."""
-        
-        templates = [
-            # Degree heuristic
-            '''import numpy as np
-from typing import Tuple, Optional
-from solver.utils import get_candidates
-
-def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
-    """
-    Degree heuristic: choose cell that affects most constrained cells.
-    """
-    max_degree = -1
-    best_cell = None
-    
-    for row in range(9):
-        for col in range(9):
-            if board[row, col] == 0:
-                # Count empty cells in same row, column, and box
-                degree = 0
-                
-                # Count empty in row
-                degree += sum(1 for c in range(9) if board[row, c] == 0 and c != col)
-                
-                # Count empty in column  
-                degree += sum(1 for r in range(9) if board[r, col] == 0 and r != row)
-                
-                # Count empty in box
-                box_row, box_col = 3 * (row // 3), 3 * (col // 3)
-                for br in range(box_row, box_row + 3):
-                    for bc in range(box_col, box_col + 3):
-                        if board[br, bc] == 0 and (br != row or bc != col):
-                            degree += 1
-                
-                if degree > max_degree:
-                    max_degree = degree
-                    best_cell = (row, col)
-    
-    return best_cell
-
-def get_heuristic_name() -> str:
-    return "degree_heuristic"
-
-def get_heuristic_description() -> str:
-    return "Degree heuristic - chooses cell affecting most constrained cells"
-''',
-            
-            # Hybrid MRV + Degree
-            '''import numpy as np
-from typing import Tuple, Optional
-from solver.utils import get_candidates
-
-def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
-    """
-    Hybrid MRV + Degree heuristic.
-    """
-    best_cell = None
-    best_score = -1
-    
-    for row in range(9):
-        for col in range(9):
-            if board[row, col] == 0:
-                candidates = get_candidates(board, row, col)
-                mrv_score = len(candidates)
-                
-                # Calculate degree
-                degree = 0
-                for r in range(9):
-                    if board[r, col] == 0 and r != row:
-                        degree += 1
-                for c in range(9):
-                    if board[row, c] == 0 and c != col:
-                        degree += 1
-                
-                # Combined score (lower is better for MRV, higher for degree)
-                combined_score = (10 - mrv_score) + degree * 0.1
-                
-                if combined_score > best_score:
-                    best_score = combined_score
-                    best_cell = (row, col)
-    
-    return best_cell
-
-def get_heuristic_name() -> str:
-    return "mrv_degree_hybrid"
-
-def get_heuristic_description() -> str:
-    return "Hybrid MRV + Degree - combines minimum remaining values with degree heuristic"
-''',
-            
-            # Sequential with optimization
-            '''import numpy as np
-from typing import Tuple, Optional
-from solver.utils import get_candidates
-
-def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
-    """
-    Sequential search with single-candidate optimization.
-    """
-    # First, look for cells with only one candidate (forced moves)
-    for row in range(9):
-        for col in range(9):
-            if board[row, col] == 0:
-                candidates = get_candidates(board, row, col)
-                if len(candidates) == 1:
-                    return (row, col)
-    
-    # If no forced moves, use MRV
+    # Simple MRV heuristic - choose cell with fewest candidates
     min_candidates = 10
     best_cell = None
     
@@ -339,16 +172,145 @@ def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
                     best_cell = (row, col)
                     if min_candidates == 1:
                         return best_cell
+    return best_cell
+
+def get_heuristic_name() -> str:
+    return "mrv_simple"
+
+def get_heuristic_description() -> str:
+    return "Minimum Remaining Values - chooses cell with fewest possible candidates"
+""",
+            """
+import numpy as np
+from typing import Tuple, Optional
+from solver.utils import get_candidates
+
+def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
+    # Degree heuristic - choose cell affecting most constrained cells
+    max_degree = -1
+    best_cell = None
+    
+    for row in range(9):
+        for col in range(9):
+            if board[row, col] == 0:
+                # Count empty cells in same row, column, and box
+                degree = 0
+                # Row and column
+                for i in range(9):
+                    if board[row, i] == 0 and i != col:
+                        degree += 1
+                    if board[i, col] == 0 and i != row:
+                        degree += 1
+                # Box
+                box_row, box_col = 3 * (row // 3), 3 * (col // 3)
+                for i in range(box_row, box_row + 3):
+                    for j in range(box_col, box_col + 3):
+                        if board[i, j] == 0 and (i != row or j != col):
+                            degree += 1
+                
+                if degree > max_degree:
+                    max_degree = degree
+                    best_cell = (row, col)
     
     return best_cell
 
 def get_heuristic_name() -> str:
-    return "forced_first_mrv"
+    return "degree_heuristic"
 
 def get_heuristic_description() -> str:
-    return "Forced moves first, then MRV - prioritizes single-candidate cells"
-'''
+    return "Degree heuristic - chooses cell affecting most other empty cells"
+""",
+            """
+import numpy as np
+from typing import Tuple, Optional
+from solver.utils import get_candidates
+
+def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
+    # Hybrid MRV + Degree heuristic
+    best_score = -1
+    best_cell = None
+    
+    for row in range(9):
+        for col in range(9):
+            if board[row, col] == 0:
+                candidates = get_candidates(board, row, col)
+                mrv_score = 10 - len(candidates)  # Fewer candidates = higher score
+                
+                # Calculate degree
+                degree = 0
+                for i in range(9):
+                    if board[row, i] == 0 and i != col:
+                        degree += 1
+                    if board[i, col] == 0 and i != row:
+                        degree += 1
+                
+                box_row, box_col = 3 * (row // 3), 3 * (col // 3)
+                for i in range(box_row, box_row + 3):
+                    for j in range(box_col, box_col + 3):
+                        if board[i, j] == 0 and (i != row or j != col):
+                            degree += 1
+                
+                # Combined score (prioritize MRV, use degree as tiebreaker)
+                combined_score = mrv_score * 10 + degree
+                
+                if combined_score > best_score:
+                    best_score = combined_score
+                    best_cell = (row, col)
+    
+    return best_cell
+
+def get_heuristic_name() -> str:
+    return "hybrid_mrv_degree"
+
+def get_heuristic_description() -> str:
+    return "Hybrid MRV + Degree heuristic combining both strategies"
+""",
         ]
-        
-        # Return up to n templates
-        return templates[:min(n, len(templates))]
+
+        generated = []
+        rnd = random.Random(0)
+        for _ in range(n):
+            template = rnd.choice(seeds)
+            generated.append(textwrap.dedent(template).strip() + "\n")
+
+        # Simple tweak: if we have previous solutions, create an improved variant.
+        if previous_solutions:
+            generated.append(
+                textwrap.dedent(
+                    """
+import numpy as np
+from typing import Tuple, Optional
+from solver.utils import get_candidates
+
+def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
+    # Improved MRV with early termination and optimization
+    min_candidates = 10
+    best_cell = None
+    
+    # Pre-calculate all candidates for efficiency
+    all_candidates = {}
+    for row in range(9):
+        for col in range(9):
+            if board[row, col] == 0:
+                candidates = get_candidates(board, row, col)
+                all_candidates[(row, col)] = candidates
+                if len(candidates) < min_candidates:
+                    min_candidates = len(candidates)
+                    best_cell = (row, col)
+                    if min_candidates == 1:
+                        return best_cell
+    
+    return best_cell
+
+def get_heuristic_name() -> str:
+    return "optimized_mrv"
+
+def get_heuristic_description() -> str:
+    return "Optimized MRV with early termination for single candidates"
+                    """
+                ).strip()
+                + "\n"
+            )
+
+        return generated[:n]
+

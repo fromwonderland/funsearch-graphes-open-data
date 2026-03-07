@@ -17,6 +17,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 from evaluation.evaluate import evaluate_all_heuristics, save_evaluation_log
 from evaluation.scoring import rank_heuristics, get_top_heuristics
 from funsearch_core.generator import FunSearchGenerator
+from pathlib import Path
 
 
 class FunSearchSudoku:
@@ -36,7 +37,7 @@ class FunSearchSudoku:
         self.candidates_per_cycle = candidates_per_cycle
         
         # Directory structure
-        self.benchmark_dir = "benchmark"
+        self.benchmark_file = "sudoku_50.csv"  # Use optimized 200 puzzles file
         self.heuristics_dir = "heuristics"
         self.log_dir = "logs"
         self.graph_dir = "graphs"
@@ -50,7 +51,7 @@ class FunSearchSudoku:
         
     def _ensure_directories(self):
         """Create necessary directories if they don't exist."""
-        for directory in [self.benchmark_dir, self.heuristics_dir, self.log_dir, self.graph_dir, self.prompts_dir]:
+        for directory in [self.heuristics_dir, self.log_dir, self.graph_dir, self.prompts_dir]:
             os.makedirs(directory, exist_ok=True)
     
     def run_evolution(self):
@@ -61,6 +62,14 @@ class FunSearchSudoku:
         print(f"Max cycles: {self.max_cycles}")
         print(f"Candidates per cycle: {self.candidates_per_cycle}")
         print("=" * 50)
+        
+        # Check if benchmark file exists
+        if not os.path.exists(self.benchmark_file):
+            print(f"Error: Benchmark file {self.benchmark_file} not found!")
+            print("Please ensure sudoku.csv is in the current directory.")
+            return
+        
+        print(f"Using benchmark file: {self.benchmark_file}")
         
         # Initial evaluation
         print("Evaluating initial heuristics...")
@@ -111,7 +120,7 @@ class FunSearchSudoku:
         
     def _evaluate_current_heuristics(self) -> List[Dict[str, Any]]:
         """Evaluate all current heuristics."""
-        return evaluate_all_heuristics(self.heuristics_dir, self.benchmark_dir)
+        return evaluate_all_heuristics(self.heuristics_dir, self.benchmark_file)
     
     def _create_baseline_heuristic(self):
         """Create a simple baseline heuristic."""
@@ -164,35 +173,24 @@ def get_heuristic_description() -> str:
             try:
                 with open(file_path, 'r') as f:
                     code = f.read()
-                heuristic_codes.append(f"// {heuristic_file}\n{code}")
+                heuristic_codes.append(code)
             except Exception as e:
                 print(f"Error reading {heuristic_file}: {e}")
         
         # Create prompt
         prompt_template_file = os.path.join(self.prompts_dir, "llm_prompt.txt")
-        try:
-            with open(prompt_template_file, 'r') as f:
-                prompt_template = f.read()
-        except FileNotFoundError:
-            print("Warning: llm_prompt.txt not found, using default prompt")
-            prompt_template = "Create a new Sudoku heuristic based on the best performing ones."
-        
-        prompt = prompt_template.format(best_heuristics="\n\n".join(heuristic_codes))
         
         # Generate new heuristics
-        generator = FunSearchGenerator(
-            prompt_path=os.path.join(self.prompts_dir, "llm_prompt.txt"),
-            use_llm=True,
-            model_name="Salesforce/codet5-small"
-        )
+        generator = FunSearchGenerator(Path(prompt_template_file))
         new_heuristics = generator.generate_candidates(
             previous_solutions=heuristic_codes, 
             n=self.candidates_per_cycle
         )
         
         # Save new heuristics
+        current_cycle = len(self.evolution_history) + 1
         for i, heuristic_code in enumerate(new_heuristics):
-            heuristic_file = f"heuristic_generated_{int(time.time())}_{i}.py"
+            heuristic_file = f"heuristic_cycle{current_cycle}_candidate{i+1}_{int(time.time())}.py"
             file_path = os.path.join(self.heuristics_dir, heuristic_file)
             
             with open(file_path, 'w') as f:

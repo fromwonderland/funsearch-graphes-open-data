@@ -1,11 +1,11 @@
+
 import numpy as np
 from typing import Tuple, Optional
 from solver.utils import get_candidates
 
 def get_next_cell(board: np.ndarray) -> Optional[Tuple[int, int]]:
     """
-    Minimum Remaining Values (MRV) heuristic.
-    Selects the cell with the fewest possible candidates.
+    Simple heuristic: find cell with fewest candidates (MRV).
     """
     min_candidates = 10
     best_cell = None

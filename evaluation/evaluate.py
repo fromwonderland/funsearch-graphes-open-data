@@ -10,12 +10,13 @@ from solver.utils import load_board_from_csv, is_valid_solution
 from solver.sudoku_solver import SudokuSolver
 
 
-def load_benchmark(file_path: str) -> List[np.ndarray]:
+def load_benchmark(file_path: str, max_puzzles: int = 1000) -> List[np.ndarray]:
     """
     Load Sudoku boards from a CSV file.
     
     Args:
         file_path: Path to CSV file
+        max_puzzles: Maximum number of puzzles to load (for performance)
         
     Returns:
         List of Sudoku boards as numpy arrays
@@ -23,20 +24,41 @@ def load_benchmark(file_path: str) -> List[np.ndarray]:
     boards = []
     try:
         with open(file_path, 'r') as f:
+            # Skip header if present
+            header = f.readline().strip()
+            if 'quizzes' in header.lower():
+                pass  # Skip header line
+            else:
+                f.seek(0)  # Reset to start if no header
+                
+            count = 0
             for line in f:
+                if count >= max_puzzles:
+                    break
+                    
                 line = line.strip()
                 if line:
-                    board = load_board_from_csv(line)
-                    boards.append(board)
+                    # Handle format: quizzes,solutions or direct puzzle
+                    try:
+                        board = load_board_from_csv(line)
+                        boards.append(board)
+                        count += 1
+                    except ValueError as e:
+                        print(f"Skipping invalid puzzle line: {e}")
+                        
     except FileNotFoundError:
         print(f"Warning: Benchmark file {file_path} not found")
-        # Return empty list if file doesn't exist
+        return []
+    except Exception as e:
+        print(f"Error loading benchmark: {e}")
+        return []
     
+    print(f"Loaded {len(boards)} puzzles from {file_path}")
     return boards
 
 
 def evaluate_heuristic(heuristic_module, benchmark_boards: List[np.ndarray], 
-                       max_time_per_board: float = 30.0) -> Dict[str, Any]:
+                       max_time_per_board: float = 1.0) -> Dict[str, Any]:
     """
     Evaluate a single heuristic on the benchmark.
     
@@ -104,30 +126,39 @@ def evaluate_heuristic(heuristic_module, benchmark_boards: List[np.ndarray],
     return results
 
 
-def evaluate_all_heuristics(heuristic_dir: str, benchmark_dir: str) -> List[Dict[str, Any]]:
+def evaluate_all_heuristics(heuristic_dir: str, benchmark_file: str = None) -> List[Dict[str, Any]]:
     """
-    Evaluate all heuristics in the directory against all benchmarks.
+    Evaluate all heuristics in the directory against benchmark.
     
     Args:
         heuristic_dir: Directory containing heuristic files
-        benchmark_dir: Directory containing benchmark CSV files
+        benchmark_file: Path to benchmark CSV file (default: sudoku.csv)
         
     Returns:
-        List of evaluation results for each heuristic-benchmark combination
+        List of evaluation results for each heuristic
     """
     import os
     import importlib.util
     
-    # Load benchmark files
-    benchmark_files = {
-        'easy': os.path.join(benchmark_dir, 'sudoku_easy.csv'),
-        'medium': os.path.join(benchmark_dir, 'sudoku_medium.csv'),
-        'hard': os.path.join(benchmark_dir, 'sudoku_hard.csv')
-    }
-    
-    benchmarks = {}
-    for difficulty, file_path in benchmark_files.items():
-        benchmarks[difficulty] = load_benchmark(file_path)
+    # Use sudoku.csv by default, fallback to benchmark directory structure
+    if benchmark_file is None:
+        benchmark_file = "sudoku.csv"
+        if not os.path.exists(benchmark_file):
+            # Fallback to old structure
+            benchmark_dir = "benchmark"
+            benchmark_files = {
+                'easy': os.path.join(benchmark_dir, 'sudoku_easy.csv'),
+                'medium': os.path.join(benchmark_dir, 'sudoku_medium.csv'),
+                'hard': os.path.join(benchmark_dir, 'sudoku_hard.csv')
+            }
+            benchmarks = {}
+            for difficulty, file_path in benchmark_files.items():
+                benchmarks[difficulty] = load_benchmark(file_path, max_puzzles=100)
+        else:
+            # Use main sudoku_50.csv file
+            benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=50)}
+    else:
+        benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=50)}
     
     # Load heuristic modules
     heuristic_files = [f for f in os.listdir(heuristic_dir) 
@@ -145,12 +176,13 @@ def evaluate_all_heuristics(heuristic_dir: str, benchmark_dir: str) -> List[Dict
             heuristic_module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(heuristic_module)
             
-            # Evaluate against each benchmark
+            # Evaluate against benchmark(s)
             for difficulty, boards in benchmarks.items():
                 if boards:  # Only evaluate if benchmark exists
                     result = evaluate_heuristic(heuristic_module, boards)
                     result['difficulty'] = difficulty
                     result['heuristic_file'] = heuristic_file
+                    result['benchmark_size'] = len(boards)
                     all_results.append(result)
                     
         except Exception as e:

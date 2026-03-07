@@ -56,5 +56,15 @@ IMPORTANT:
 - Consider edge cases (empty board, nearly complete board)
 - Test your logic mentally before writing the code
 - Aim for innovation while maintaining correctness
+- CRITICAL: Always return a valid (row, col) tuple for empty cells, or None if board is complete
+- CRITICAL: Never return None when empty cells exist - this causes infinite loops
+- CRITICAL: Ensure your heuristic terminates by always finding a cell or explicitly returning None for completed boards
+- CRITICAL: Validate that (row, col) is within bounds [0,8] and board[row,col] == 0
+
+SAFETY CHECKLIST:
+1. Does your function handle boards with no empty cells? (return None)
+2. Does your function handle boards with empty cells? (return valid (row,col))
+3. Does your function avoid infinite loops? (deterministic selection)
+4. Does your function handle edge cases? (empty board, single cell)
 
 Generate a complete, working heuristic function that could outperform the current best approaches.

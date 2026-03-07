@@ -1,0 +1,31 @@
+{
+  "experiment_summary": {
+    "total_cycles": 3,
+    "max_cycles": 3,
+    "candidates_per_cycle": 2,
+    "start_time": 1,
+    "end_time": 3
+  },
+  "evolution_history": [
+    {
+      "cycle": 1,
+      "best_score": 0.8999604561614991,
+      "num_heuristics": 6,
+      "avg_score": 0.36662857638041185
+    },
+    {
+      "cycle": 2,
+      "best_score": 0.8999269694519043,
+      "num_heuristics": 8,
+      "avg_score": 0.2999683424377441
+    },
+    {
+      "cycle": 3,
+      "best_score": 0.8999218878173827,
+      "num_heuristics": 10,
+      "avg_score": 0.2599752168998718
+    }
+  ],
+  "final_best_score": 0.8999604561614991,
+  "improvement": -3.856834411641863e-05
+}
