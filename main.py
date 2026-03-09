@@ -185,7 +185,7 @@ def get_heuristic_description() -> str:
         generator = FunSearchGenerator(Path(prompt_template_file))
         
         # Generate new heuristics
-        print(f"🧠 Génération de {self.candidates_per_cycle} nouvelle(s) heuristique(s) via Mistral...")
+        print(f"🧠 Génération de {self.candidates_per_cycle} nouvelle(s) heuristique(s) via LLM...")
         new_heuristics = generator.generate_candidates(
             previous_solutions=heuristic_codes, 
             n=self.candidates_per_cycle
@@ -382,8 +382,8 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="FunSearch Sudoku Evolution")
-    parser.add_argument("--cycles", type=int, default=20, help="Number of evolution cycles")
-    parser.add_argument("--candidates", type=int, default=12, help="Candidates per cycle")
+    parser.add_argument("--cycles", type=int, default=5, help="Number of evolution cycles")
+    parser.add_argument("--candidates", type=int, default=3, help="Candidates per cycle")
     
     args = parser.parse_args()
     

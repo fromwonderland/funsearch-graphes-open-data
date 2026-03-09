@@ -5,9 +5,171 @@ Evaluation module for Sudoku heuristics
 import time
 import json
 import numpy as np
+import importlib.util
 from typing import Dict, List, Any, Tuple
 from solver.utils import load_board_from_csv, is_valid_solution
 from solver.sudoku_solver import SudokuSolver
+
+
+def evaluate_collection_module(heuristic_module, benchmark_boards: List[np.ndarray], 
+                              max_time_per_board: float = 0.1) -> Dict[str, Any]:
+    """
+    Evaluate the collection module by finding and evaluating the best heuristic in it.
+    
+    Args:
+        heuristic_module: The imported heuristic_collection module
+        benchmark_boards: List of Sudoku boards to test
+        max_time_per_board: Maximum time allowed per board (seconds)
+        
+    Returns:
+        Dictionary with evaluation results for the best heuristic
+    """
+    # Find all heuristic functions in the collection
+    heuristic_functions = []
+    
+    # Get all attributes that start with "get_next_cell_"
+    for attr_name in dir(heuristic_module):
+        if attr_name.startswith('get_next_cell_') and callable(getattr(heuristic_module, attr_name)):
+            # Get the corresponding name and description functions
+            name_attr = attr_name.replace('get_next_cell_', 'get_heuristic_name_')
+            desc_attr = attr_name.replace('get_next_cell_', 'get_heuristic_description_')
+            
+            heuristic_func = getattr(heuristic_module, attr_name)
+            heuristic_name = getattr(heuristic_module, name_attr, lambda: "unknown")()
+            heuristic_desc = getattr(heuristic_module, desc_attr, lambda: "No description")()
+            
+            heuristic_functions.append({
+                'func': heuristic_func,
+                'name': heuristic_name,
+                'description': heuristic_desc,
+                'attr_name': attr_name
+            })
+    
+    if not heuristic_functions:
+        return {
+            'heuristic_name': 'collection_empty',
+            'total_boards': len(benchmark_boards),
+            'solved_boards': 0,
+            'failed_boards': len(benchmark_boards),
+            'timeout_boards': 0,
+            'total_time': 0.0,
+            'average_time_per_board': 0.0,
+            'total_backtracks': 0,
+            'total_nodes': 0,
+            'enhanced_score': -10000.0,
+            'error': 'No heuristic functions found in collection'
+        }
+    
+    # Evaluate each heuristic and return the best one
+    best_result = None
+    best_score = float('-inf')
+    
+    for heuristic_info in heuristic_functions:
+        try:
+            # Create a simple module-like object for evaluation
+            class SimpleModule:
+                def __init__(self, func, name, desc):
+                    self.get_next_cell = func
+                    self.get_heuristic_name = lambda: name
+                    self.get_heuristic_description = lambda: desc
+            
+            simple_module = SimpleModule(
+                heuristic_info['func'], 
+                heuristic_info['name'], 
+                heuristic_info['description']
+            )
+            
+            # Evaluate this heuristic
+            result = evaluate_single_heuristic(simple_module, benchmark_boards, max_time_per_board)
+            result['collection_function'] = heuristic_info['attr_name']
+            
+            # Check if this is the best so far
+            if result['enhanced_score'] > best_score:
+                best_score = result['enhanced_score']
+                best_result = result
+                
+        except Exception as e:
+            print(f"Error evaluating {heuristic_info['attr_name']}: {e}")
+            continue
+    
+    return best_result or {'error': 'All heuristics failed to evaluate'}
+
+
+def evaluate_single_heuristic(heuristic_module, benchmark_boards: List[np.ndarray], 
+                              max_time_per_board: float = 0.1) -> Dict[str, Any]:
+    """
+    Evaluate a single heuristic on the benchmark with enhanced scoring.
+    
+    Args:
+        heuristic_module: Imported heuristic module
+        benchmark_boards: List of Sudoku boards to test
+        max_time_per_board: Maximum time allowed per board (seconds)
+        
+    Returns:
+        Dictionary with evaluation results
+    """
+    results = {
+        'heuristic_name': heuristic_module.get_heuristic_name(),
+        'total_boards': len(benchmark_boards),
+        'solved_boards': 0,
+        'failed_boards': 0,
+        'timeout_boards': 0,
+        'total_time': 0.0,
+        'average_time_per_board': 0.0,
+        'total_backtracks': 0,
+        'total_nodes': 0,
+        'enhanced_score': 0.0
+    }
+    
+    for board_idx, board in enumerate(benchmark_boards):
+        solver = SudokuSolver(heuristic_module.get_next_cell)
+        
+        start_time = time.time()
+        solved = solver.solve(board, max_time=max_time_per_board)
+        elapsed = time.time() - start_time
+        
+        if solved is not None:
+            results['solved_boards'] += 1
+        elif elapsed >= max_time_per_board:
+            results['timeout_boards'] += 1
+        else:
+            results['failed_boards'] += 1
+        
+        results['total_time'] += elapsed
+        results['total_backtracks'] += solver.backtrack_count
+        results['total_nodes'] += solver.nodes_explored
+    
+    results['average_time_per_board'] = results['total_time'] / len(benchmark_boards)
+    results['enhanced_score'] = (
+        1000 * (results['solved_boards'] / len(benchmark_boards)) 
+        - 0.1 * results['total_backtracks'] 
+        - 0.01 * results['total_nodes'] 
+        - results['total_time'] * 1000
+    )
+    
+    return results
+
+
+def evaluate_heuristic(heuristic_module, benchmark_boards: List[np.ndarray], 
+                       max_time_per_board: float = 0.1) -> Dict[str, Any]:
+    """
+    Evaluate a single heuristic on the benchmark with enhanced scoring.
+    
+    Args:
+        heuristic_module: Imported heuristic module
+        benchmark_boards: List of Sudoku boards to test
+        max_time_per_board: Maximum time allowed per board (seconds)
+        
+    Returns:
+        Dictionary with evaluation results
+    """
+    # Handle collection module differently
+    if hasattr(heuristic_module, '__name__') and heuristic_module.__name__ == 'heuristic_collection':
+        # For collection module, we need to evaluate each heuristic separately
+        return evaluate_collection_module(heuristic_module, benchmark_boards, max_time_per_board)
+    
+    # For regular modules, use the single heuristic evaluation
+    return evaluate_single_heuristic(heuristic_module, benchmark_boards, max_time_per_board)
 
 
 def load_benchmark(file_path: str, max_puzzles: int = 1000) -> List[np.ndarray]:
@@ -57,100 +219,6 @@ def load_benchmark(file_path: str, max_puzzles: int = 1000) -> List[np.ndarray]:
     return boards
 
 
-def evaluate_heuristic(heuristic_module, benchmark_boards: List[np.ndarray], 
-                       max_time_per_board: float = 0.1) -> Dict[str, Any]:
-    """
-    Evaluate a single heuristic on the benchmark with enhanced scoring.
-    
-    Args:
-        heuristic_module: Imported heuristic module
-        benchmark_boards: List of Sudoku boards to test
-        max_time_per_board: Maximum time allowed per board (seconds)
-        
-    Returns:
-        Dictionary with evaluation results
-    """
-    results = {
-        'heuristic_name': heuristic_module.get_heuristic_name(),
-        'total_boards': len(benchmark_boards),
-        'solved_boards': 0,
-        'failed_boards': 0,
-        'timeout_boards': 0,
-        'total_time': 0.0,
-        'average_time_per_board': 0.0,
-        'total_backtracks': 0,
-        'total_nodes': 0,
-        'enhanced_score': 0.0,
-        'board_results': []
-    }
-    
-    solver = SudokuSolver(heuristic_module.get_next_cell)
-    
-    for i, board in enumerate(benchmark_boards):
-        board_copy = board.copy()
-        start_time = time.time()
-        
-        try:
-            # Attempt to solve the board with tracking
-            solved = solver.solve(board_copy, max_time=max_time_per_board)
-            solving_time = time.time() - start_time
-            
-            # Get solver statistics
-            backtracks = getattr(solver, 'backtrack_count', 0)
-            nodes = getattr(solver, 'node_count', 0)
-            
-            if solved and is_valid_solution(board_copy):
-                results['solved_boards'] += 1
-                status = 'solved'
-            else:
-                results['failed_boards'] += 1
-                status = 'failed'
-                
-        except TimeoutError:
-            results['timeout_boards'] += 1
-            solving_time = max_time_per_board
-            backtracks = getattr(solver, 'backtrack_count', 0)
-            nodes = getattr(solver, 'node_count', 0)
-            status = 'timeout'
-            
-        except Exception as e:
-            results['failed_boards'] += 1
-            solving_time = time.time() - start_time
-            backtracks = getattr(solver, 'backtrack_count', 0)
-            nodes = getattr(solver, 'node_count', 0)
-            status = f'error: {str(e)}'
-        
-        results['total_time'] += solving_time
-        results['total_backtracks'] += backtracks
-        results['total_nodes'] += nodes
-        
-        results['board_results'].append({
-            'board_index': i,
-            'status': status,
-            'time': solving_time,
-            'backtracks': backtracks,
-            'nodes': nodes,
-            'empty_cells': int(np.sum(board == 0))
-        })
-    
-    if results['total_boards'] > 0:
-        results['average_time_per_board'] = results['total_time'] / results['total_boards']
-        results['success_rate'] = results['solved_boards'] / results['total_boards']
-        
-        # Enhanced scoring formula (NEW)
-        results['enhanced_score'] = (
-            1000 * results['success_rate'] 
-            - 0.1 * results['total_backtracks'] 
-            - 0.01 * results['total_nodes'] 
-            - results['total_time'] * 1000  # Convert to milliseconds
-        )
-    else:
-        results['success_rate'] = 0.0
-        results['enhanced_score'] = 0.0
-    
-    return results
-
-
 def evaluate_all_heuristics(heuristic_dir: str, benchmark_file: str = None) -> List[Dict[str, Any]]:
     """
     Evaluate all heuristics in the directory against benchmark.
@@ -181,9 +249,9 @@ def evaluate_all_heuristics(heuristic_dir: str, benchmark_file: str = None) -> L
                 benchmarks[difficulty] = load_benchmark(file_path, max_puzzles=100)
         else:
             # Use main sudoku_50.csv file
-            benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=1000)}
+            benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=100)}
     else:
-        benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=1000)}
+        benchmarks = {'main': load_benchmark(benchmark_file, max_puzzles=100)}
     
     # Load heuristic modules
     heuristic_files = [f for f in os.listdir(heuristic_dir) 

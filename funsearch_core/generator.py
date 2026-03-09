@@ -56,7 +56,7 @@ class FunSearchGenerator:
             self.prompt = prompt_path.read_text(encoding="utf-8")
         self.use_ollama = use_ollama if use_ollama is not None else (os.getenv("FUNSEARCH_USE_OLLAMA", "1") == "1")
         self.ollama_base_url = ollama_base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
-        self.ollama_model = ollama_model or os.getenv("OLLAMA_MODEL", "mistral:7b")
+        self.ollama_model = ollama_model or "qwen2.5-coder:14b"  
         self.ollama_timeout_s = float(os.getenv("OLLAMA_TIMEOUT_S", str(ollama_timeout_s)))
 
     def generate_candidates(
@@ -86,11 +86,11 @@ class FunSearchGenerator:
             "CRITICAL: Never return None when empty cells exist - this causes infinite loops in the solver."
         )
         reinject = ""
-        # Désactiver reinject pour forcer la créativité avec Mistral
-        # if previous_solutions:
-        #     reinject = "\n\nPrevious best solution(s) (for improvement, do NOT copy blindly):\n" + "\n\n".join(
-        #         previous_solutions[:2]
-        #     )
+        # Réactiver reinject pour Qwen2.5-Coder (plus créatif)
+        if previous_solutions:
+            reinject = "\n\nPrevious best solution(s) (for improvement, do NOT copy blindly):\n" + "\n\n".join(
+                previous_solutions[:2]
+            )
 
         user_prompt = (
             self.prompt
@@ -109,7 +109,7 @@ class FunSearchGenerator:
                 "system": system,
                 "stream": False,
                 "options": {
-                    "temperature": 1.2 if i == 0 else 1.5,
+                    "temperature": 1.5 if i == 0 else 2.0,  # Plus créatif pour Qwen2.5-Coder
                     "top_p": 0.9,
                     "num_predict": 512,
                 },
@@ -389,11 +389,14 @@ from solver.utils import get_candidates
         # Add the new heuristic to collection
         new_heuristic_code = f'''
 # Heuristic: {unique_name} (Cycle {cycle}, Candidate {candidate_id})
+def get_next_cell_{unique_name}(board: np.ndarray) -> Optional[Tuple[int, int]]:
 {code}
 
-def get_next_cell_{unique_name}(board: np.ndarray) -> Optional[Tuple[int, int]]:
-    """Wrapper for {unique_name}"""
-    return get_next_cell(board)
+def get_heuristic_name_{unique_name}() -> str:
+    return "{func_name}"
+
+def get_heuristic_description_{unique_name}() -> str:
+    return "Generated heuristic - {func_name}"
 
 '''
         
